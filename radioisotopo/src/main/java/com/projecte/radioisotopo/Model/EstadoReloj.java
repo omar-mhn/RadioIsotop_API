@@ -1,5 +1,5 @@
 package com.projecte.radioisotopo.Model;
 
-public enum Estado {
+public enum EstadoReloj {
     Disponible, Asignado, EnMantenimiento;
 }

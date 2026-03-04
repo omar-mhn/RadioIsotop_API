@@ -2,12 +2,16 @@ package com.projecte.radioisotopo.Model;
 
 
 import java.sql.Date;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -50,8 +54,19 @@ public class Paciente {
     @JoinColumn(name = "id_departamento")
     private Departamento departamento;
 
+    
+    @ManyToMany
+    @JoinTable(
+        name = "Contacto", // El nombre exacto de la tabla intermedia en tu base de datos SQL
+        joinColumns = @JoinColumn(name = "id_paciente"), // La columna que apunta a ESTA clase (Paciente)
+        inverseJoinColumns = @JoinColumn(name = "id_familiar") // La columna que apunta a la OTRA clase (Familiar)
+    )
+    private List<Familiar> familiares; // Una lista porque son "Muchos" familiares
+
+
     public Paciente(Long id, String nombre, String apellido, String numTelefono, String email, String dni,
-            String tarjetaSanitaria, Date fechaNacimiento, Double peso, Double altura, Departamento departamento) {
+            String tarjetaSanitaria, Date fechaNacimiento, Double peso, Double altura, Departamento departamento,
+            List<Familiar> familiares) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -63,6 +78,7 @@ public class Paciente {
         this.peso = peso;
         this.altura = altura;
         this.departamento = departamento;
+        this.familiares = familiares;
     }
 
     public Paciente() {
@@ -156,4 +172,12 @@ public class Paciente {
         this.departamento = departamento;
     }
 
+    public List<Familiar> getFamiliares() {
+        return familiares;
+    }
+
+    public void setFamiliares(List<Familiar> familiares) {
+        this.familiares = familiares;
+    }
+    
 }

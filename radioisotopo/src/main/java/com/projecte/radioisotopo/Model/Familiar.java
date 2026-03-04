@@ -1,10 +1,13 @@
 package com.projecte.radioisotopo.Model;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -32,6 +35,12 @@ public class Familiar {
 
     @Column(length = 50,unique = true)
     private String tarjetaSanitaria;
+
+    // Le decimos que mire la variable "familiares" que acabamos de crear en la clase Paciente,
+    // porque allí ya están todas las reglas de la tabla "Contacto".
+
+    @ManyToMany(mappedBy = "familiares")
+    private List<Paciente> pacientes; // Una lista porque son "Muchos" pacientes
 
     public Familiar(Long id, String nombre, String apellido, String numTelefono, String email, String dni,
             String tarjetaSanitaria) {

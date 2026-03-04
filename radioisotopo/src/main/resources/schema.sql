@@ -81,8 +81,8 @@ CREATE TABLE Reloj (
     id INT AUTO_INCREMENT PRIMARY KEY,
     imei VARCHAR(50) UNIQUE NOT NULL,
     mac_address VARCHAR(50) UNIQUE NOT NULL,
-    estado ENUM('Disponible', 'Asignado', 'En Mantenimiento') NOT NULL,
-    bateria_actual INT
+    estado_reloj ENUM('Disponible', 'Asignado', 'En_Mantenimiento') NOT NULL,
+    bateria_actual INT NOT NULL;
 );
 
 
@@ -96,7 +96,7 @@ CREATE TABLE Tratamientos (
     dosis_inicial DECIMAL(10,2) NOT NULL,
     fecha_administracion DATE NOT NULL,
     fecha_final_estimada DATE,
-    estado ENUM('Activo', 'Finalizado', 'Cancelado') NOT NULL,
+    estado_tratamiento ENUM('Activo', 'Finalizado', 'Cancelado') NOT NULL,
     CONSTRAINT fk_tratamiento_paciente
         FOREIGN KEY (id_paciente)
         REFERENCES Paciente(id)
@@ -115,7 +115,7 @@ CREATE TABLE Telemetria (
     id_tratamiento INT NOT NULL,
     fecha_hora DATETIME NOT NULL,
     frecuencia_cardiaca INT,
-    pasos_acumulados INT,
+    pasos_acumulados INT NOT NULL,
     temperatura DECIMAL(4,2),
     radiacion_actual DECIMAL(10,4) NOT NULL,
     CONSTRAINT fk_telemetria_tratamiento
@@ -130,7 +130,7 @@ CREATE TABLE Telemetria (
 CREATE TABLE Alerta (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_tratamiento INT NOT NULL,
-    tipo ENUM('Alerta', 'Recomendación') NOT NULL,
+    tipo ENUM('Alerta', 'Recomendacion') NOT NULL,
     mensaje TEXT NOT NULL,
     fecha_hora DATETIME NOT NULL,
     CONSTRAINT fk_alerta_tratamiento
