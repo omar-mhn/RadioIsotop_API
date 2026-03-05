@@ -18,13 +18,14 @@ public class Reloj {
     @Column(length=50,unique=true,nullable=false)
     private String imei;
 
-    @Column(length = 50, unique = true, nullable = false)
+    @Column(name = "mac_address",length = 50, unique = true, nullable = false)
     private String macAddress;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "estado_reloj")
     private EstadoReloj estado;
 
-    @Column()
+    @Column(name = "bateria_actual")
     private int bateriaActual;
 
     public Reloj(Long id, String imei, String macAddress, EstadoReloj estadoReloj, int bateriaActual) {

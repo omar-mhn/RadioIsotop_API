@@ -23,7 +23,7 @@ public class Familiar {
     @Column(length = 100, nullable = false)
     private String apellido;
 
-    @Column(length = 20, nullable = false,unique = true)
+    @Column(name="num_telefono",length = 20, nullable = false,unique = true)
     private String numTelefono;
 
 
@@ -33,7 +33,7 @@ public class Familiar {
     @Column(length = 20, nullable = false,unique = true)
     private String dni;
 
-    @Column(length = 50,unique = true)
+    @Column(name="tarjeta_sanitaria",length = 50,unique = true)
     private String tarjetaSanitaria;
 
     // Le decimos que mire la variable "familiares" que acabamos de crear en la clase Paciente,

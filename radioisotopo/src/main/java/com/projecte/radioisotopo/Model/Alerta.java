@@ -28,7 +28,7 @@ public class Alerta {
     @Column(columnDefinition = "TEXT",nullable = false)
     private String mensaje;
 
-    @Column(nullable = false)
+    @Column(name ="fecha_hora", nullable = false)
     private Timestamp fechaHora;
 
     @ManyToOne

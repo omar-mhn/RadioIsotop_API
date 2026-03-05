@@ -21,19 +21,20 @@ import jakarta.persistence.ManyToOne;
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
-        @Column(length = 50, nullable = false)
+        @Column(name = "tipo_isotopo", length = 50, nullable = false)
         private String tipoIsotopo;
 
-        @Column(nullable = false)
+        @Column(name = "dosis_inicial",nullable = false)
         private double dosisInicial;
 
-        @Column(nullable = false)
+        @Column(name="fecha_administracion",nullable = false)
         private Timestamp fechaAdministracion;
 
-        @Column()
+        @Column(name = "fecha_final_estimada")
         private Timestamp fechaFinalEstimada;
 
         @Enumerated(EnumType.STRING)
+        @Column(name = "estado_tratamiento")
         private EstadoTratamiento estadoTratamiento;
 
 

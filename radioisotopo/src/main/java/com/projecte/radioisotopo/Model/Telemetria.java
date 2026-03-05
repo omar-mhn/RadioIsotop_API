@@ -21,19 +21,19 @@
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
-        @Column(nullable = false)
+        @Column(name = "fecha_hora",nullable = false)
         private Timestamp fechaHora;
 
-        @Column()
+        @Column(name = "frecuencia_cardiaca")
         private Integer frecuenciaCardiaca;
 
-        @Column(nullable = false)
+        @Column(name = "pasos_acumulados",nullable = false)
         private int pasosAcumulados;
 
         @Column()
         private Double temperatura;
 
-        @Column(nullable = false)
+        @Column(name = "radiacion_actual", nullable = false)
         private double radiacionActual;
 
         @ManyToOne
