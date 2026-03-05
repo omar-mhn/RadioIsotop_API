@@ -38,10 +38,10 @@ public class Paciente {
     @Column(length = 20, nullable = false,unique = true)
     private String dni;
 
-    @Column(length = 25,unique = true)
+    @Column(name = "tarjeta_sanitaria",length = 25,unique = true)
     private String tarjetaSanitaria;
 
-    @Column
+    @Column(name = "fecha_nacimiento")
     private Date fechaNacimiento;
 
     @Column

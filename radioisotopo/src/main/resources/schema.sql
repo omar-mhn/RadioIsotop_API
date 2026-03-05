@@ -1,6 +1,6 @@
 -- TABLA DEPARTAMENTO
 
-CREATE TABLE Departamento (
+CREATE TABLE IF NOT EXISTS Departamento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL UNIQUE,
     centro VARCHAR(50) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE Departamento (
 
 -- TABLA DOCTOR
 
-CREATE TABLE Doctor (
+CREATE TABLE IF NOT EXISTS Doctor (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE Doctor (
 
 -- TABLA PACIENTE
 
-CREATE TABLE Paciente (
+CREATE TABLE IF NOT EXISTS Paciente (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
@@ -48,22 +48,23 @@ CREATE TABLE Paciente (
 
 -- TABLA FAMILIAR
 
-CREATE TABLE Familiar (
+CREATE TABLE IF NOT EXISTS Familiar (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     num_telefono VARCHAR(20) NOT NULL UNIQUE,
     email VARCHAR(100),
     dni VARCHAR(20) NOT NULL UNIQUE,
-    tarjeta_sanitaria VARCHAR(50) UNIQUE,
+    tarjeta_sanitaria VARCHAR(50) UNIQUE
 );
 
 
 -- TABLA CONTACTO
 
-CREATE TABLE Contacto (
-    id_paciente INT PRIMARY KEY,
-    id_familiar INT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS Contacto (
+    id_paciente INT,
+    id_familiar INT,
+    PRIMARY KEY (id_paciente, id_familiar), 
     CONSTRAINT fk_paciente_contacto
         FOREIGN KEY (id_paciente)
         REFERENCES Paciente(id)
@@ -77,18 +78,18 @@ CREATE TABLE Contacto (
 
 -- TABLA RELOJ
 
-CREATE TABLE Reloj (
+CREATE TABLE IF NOT EXISTS Reloj (
     id INT AUTO_INCREMENT PRIMARY KEY,
     imei VARCHAR(50) UNIQUE NOT NULL,
     mac_address VARCHAR(50) UNIQUE NOT NULL,
     estado_reloj ENUM('Disponible', 'Asignado', 'En_Mantenimiento') NOT NULL,
-    bateria_actual INT NOT NULL;
+    bateria_actual INT NOT NULL
 );
 
 
 -- TABLA TRATAMIENTOS
 
-CREATE TABLE Tratamientos (
+CREATE TABLE IF NOT EXISTS Tratamientos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_paciente INT NOT NULL,
     id_reloj INT NOT NULL,
@@ -103,14 +104,14 @@ CREATE TABLE Tratamientos (
         ON DELETE CASCADE,
     CONSTRAINT fk_tratamiento_reloj
         FOREIGN KEY (id_reloj)
-        REFERENCES Reloj(id_reloj)
+        REFERENCES Reloj(id)
         ON DELETE CASCADE
 );
 
 
 -- TABLA TELEMETRIA
 
-CREATE TABLE Telemetria (
+CREATE TABLE IF NOT EXISTS Telemetria (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_tratamiento INT NOT NULL,
     fecha_hora DATETIME NOT NULL,
@@ -127,7 +128,7 @@ CREATE TABLE Telemetria (
 
 -- TABLA ALERTA
 
-CREATE TABLE Alerta (
+CREATE TABLE IF NOT EXISTS Alerta (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_tratamiento INT NOT NULL,
     tipo ENUM('Alerta', 'Recomendacion') NOT NULL,

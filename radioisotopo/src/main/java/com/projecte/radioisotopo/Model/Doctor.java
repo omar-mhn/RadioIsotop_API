@@ -26,7 +26,7 @@
             @Column(length = 100, nullable = false,unique = true)
             private String email;
 
-            @Column(length = 50)
+            @Column(name="num_colegiado",length = 50)
             private String numColegiado;
 
             @Enumerated(EnumType.STRING)
