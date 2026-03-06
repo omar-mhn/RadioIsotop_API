@@ -84,11 +84,11 @@
                 this.email = email;
             }
 
-            public String getNum_colegiado() {
+            public String getNumColegiado() {
                 return numColegiado;
             }
 
-            public void setNum_colegiado(String num_colegiado) {
+            public void setNumColegiado(String num_colegiado) {
                 this.numColegiado = num_colegiado;
             }
 

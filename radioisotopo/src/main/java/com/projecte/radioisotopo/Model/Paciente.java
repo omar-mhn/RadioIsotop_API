@@ -28,7 +28,7 @@ public class Paciente {
     @Column(length = 100, nullable = false)
     private String apellido;
 
-    @Column(length = 20, nullable = false,unique = true)
+    @Column(name = "num_telefono" ,length = 20, nullable = false,unique = true)
     private String numTelefono;
 
 
