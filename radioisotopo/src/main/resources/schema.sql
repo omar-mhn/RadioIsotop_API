@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS Reloj (
 CREATE TABLE IF NOT EXISTS Tratamientos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_paciente INT NOT NULL,
+    id_doctor INT NOT NULL,
     id_reloj INT NOT NULL,
     tipo_isotopo VARCHAR(50) NOT NULL,
     dosis_inicial DECIMAL(10,2) NOT NULL,
@@ -101,6 +102,10 @@ CREATE TABLE IF NOT EXISTS Tratamientos (
     CONSTRAINT fk_tratamiento_paciente
         FOREIGN KEY (id_paciente)
         REFERENCES Paciente(id)
+        ON DELETE CASCADE,
+        CONSTRAINT fk_tratamiento_doctor
+        FOREIGN KEY (id_doctor)
+        REFERENCES Doctor(id)   -- Relación con la tabla Doctor
         ON DELETE CASCADE,
     CONSTRAINT fk_tratamiento_reloj
         FOREIGN KEY (id_reloj)

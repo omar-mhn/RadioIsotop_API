@@ -46,8 +46,15 @@ import jakarta.persistence.ManyToOne;
         @JoinColumn(name = "id_reloj",nullable = false)
         private Reloj reloj;
 
+        @ManyToOne
+        @JoinColumn(name = "id_doctor", nullable = false)
+        private Doctor doctor; // El médico que supervisa el tratamiento
+
+        
+
         public Tratamiento(Long id, String tipoIsotopo, double dosisInicial, Timestamp fechaAdministracion,
-                Timestamp fechaFinalEstimada, EstadoTratamiento estadoTratamiento, Paciente paciente, Reloj reloj) {
+                Timestamp fechaFinalEstimada, EstadoTratamiento estadoTratamiento, Paciente paciente, Reloj reloj,
+                Doctor doctor) {
             this.id = id;
             this.tipoIsotopo = tipoIsotopo;
             this.dosisInicial = dosisInicial;
@@ -56,6 +63,7 @@ import jakarta.persistence.ManyToOne;
             this.estadoTratamiento = estadoTratamiento;
             this.paciente = paciente;
             this.reloj = reloj;
+            this.doctor = doctor;
         }
 
         public Tratamiento() {
@@ -125,6 +133,14 @@ import jakarta.persistence.ManyToOne;
             this.reloj = reloj;
         }
 
+        public Doctor getDoctor() {
+            return doctor;
+        }
+
+        public void setDoctor(Doctor doctor) {
+            this.doctor = doctor;
+        }
+        
         
         
     }
