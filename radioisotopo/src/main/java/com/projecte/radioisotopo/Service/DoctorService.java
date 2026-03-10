@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +64,8 @@ public class DoctorService {
             doctorExistente.setEmail(detallesActualizados.getEmail());
             doctorExistente.setNumColegiado(detallesActualizados.getNumColegiado());
             doctorExistente.setRol(detallesActualizados.getRol());
+            // Actualizamos el departamento asignado
+            doctorExistente.setDepartamento(detallesActualizados.getDepartamento());
            
             
             Doctor doctorActualizado = doctorRepository.save(doctorExistente);
@@ -83,6 +86,8 @@ public class DoctorService {
     // TRADUCTOR FHIR: Doctor (Java) -> Practitioner (FHIR)
     private Practitioner convertirAFhir(Doctor miDoctor) {
         Practitioner fhirPractitioner = new Practitioner();
+        // Asignar el ID de la base de datos al recurso FHIR
+        fhirPractitioner.setId(miDoctor.getId().toString());
         
         // Número de Colegiado (Licencia Médica)
         if (miDoctor.getNumColegiado() != null) {
@@ -101,6 +106,13 @@ public class DoctorService {
             fhirPractitioner.addTelecom()
                 .setSystem(ContactPoint.ContactPointSystem.EMAIL)
                 .setValue(miDoctor.getEmail());
+        }
+        // Relación con el Departamento (Organization)
+        if (miDoctor.getDepartamento() != null) {
+            // Creamos la referencia al departamento
+            Reference refOrg = new Reference();
+            refOrg.setReference("Organization/" + miDoctor.getDepartamento().getId());
+            refOrg.setDisplay(miDoctor.getDepartamento().getNombre());
         }
 
         return fhirPractitioner;
