@@ -6,9 +6,11 @@ import java.util.Optional;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.projecte.radioisotopo.Model.Familiar;
 import com.projecte.radioisotopo.Model.Paciente;
 import com.projecte.radioisotopo.Repository.PacienteRepository;
 
@@ -78,6 +80,9 @@ public class PacienteService {
             pacienteExistente.setPeso(detallesActualizados.getPeso());
             pacienteExistente.setAltura(detallesActualizados.getAltura());
             
+            // Actualizamos el departamento y los familiares
+            pacienteExistente.setDepartamento(detallesActualizados.getDepartamento());
+            pacienteExistente.setFamiliares(detallesActualizados.getFamiliares());
             // Guardamos y devolvemos en formato FHIR
             Paciente pacienteActualizado = pacienteRepository.save(pacienteExistente);
             return fhirParser.encodeResourceToString(convertirAFhir(pacienteActualizado));
@@ -94,9 +99,11 @@ public class PacienteService {
         return false; 
     }
 
-
+    // TRADUCTOR FHIR: Mapea Paciente (Java) -> Patient (FHIR)
     private Patient convertirAFhir(Paciente miPaciente) {
         Patient fhirPatient = new Patient();
+        // Asigna el ID de la base de datos al recurso FHIR
+        fhirPatient.setId(miPaciente.getId().toString());
         
         // DNI
         fhirPatient.addIdentifier()
@@ -130,6 +137,32 @@ public class PacienteService {
         // Fecha de Nacimiento
         if (miPaciente.getFechaNacimiento() != null) {
             fhirPatient.setBirthDate(miPaciente.getFechaNacimiento());
+        }
+        //  Mapeo del Departamento (Organization)
+        // En FHIR, un paciente pertenece a una "ManagingOrganization"
+        if (miPaciente.getDepartamento() != null) {
+            Reference refOrg = new Reference();
+            refOrg.setReference("Organization/" + miPaciente.getDepartamento().getId());
+            refOrg.setDisplay(miPaciente.getDepartamento().getNombre());
+            fhirPatient.setManagingOrganization(refOrg);
+        }
+
+        // Mapeo de Familiares (Contact)
+        // Recorremos la lista de familiares y los añadimos como contactos del paciente
+        if (miPaciente.getFamiliares() != null) {
+            for (Familiar fam : miPaciente.getFamiliares()) {
+                Patient.ContactComponent contactoFhir = fhirPatient.addContact();
+                
+                // Nombre del familiar
+                contactoFhir.getName()
+                    .setFamily(fam.getApellido())
+                    .addGiven(fam.getNombre());
+                
+                // Teléfono del familiar
+                contactoFhir.addTelecom()
+                    .setSystem(ContactPoint.ContactPointSystem.PHONE)
+                    .setValue(fam.getNumTelefono());
+            }
         }
         return fhirPatient;
     }
