@@ -1,0 +1,94 @@
+package com.projecte.radioisotopo.Service;
+
+import java.util.List;
+import java.util.Optional;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Device;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.projecte.radioisotopo.Model.Reloj;
+import com.projecte.radioisotopo.Repository.RelojRepository;
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.IParser;
+
+@Service
+public class RelojService {
+
+    @Autowired
+    private RelojRepository relojRepository;
+
+    private final IParser fhirParser;
+
+    public RelojService() {
+        FhirContext ctx = FhirContext.forR4();
+        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
+    }
+    // Create
+    public String crearReloj(Reloj newReloj) {
+        Reloj guardado = relojRepository.save(newReloj);
+        return fhirParser.encodeResourceToString(convertirAFhir(guardado));
+    }
+    // read all
+    public String obtenerTodos() {
+        List<Reloj> lista = relojRepository.findAll();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Reloj r : lista) bundle.addEntry().setResource(convertirAFhir(r));
+        return fhirParser.encodeResourceToString(bundle);
+    }
+    // read one
+    public String obtenerPorId(Long id) {
+        Optional<Reloj> relojOpt = relojRepository.findById(id);
+        if (relojOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(relojOpt.get()));
+        }
+        return null;
+    }
+
+    // UPDATE 
+    public String actualizarReloj(Long id, Reloj detalles) {
+        Optional<Reloj> relojOpt = relojRepository.findById(id);
+        if (relojOpt.isPresent()) {
+            Reloj r = relojOpt.get();
+            r.setImei(detalles.getImei());
+            r.setMacAddress(detalles.getMacAddress());
+            r.setEstadoReloj(detalles.getEstadoReloj());
+            r.setBateriaActual(detalles.getBateriaActual());
+            
+            Reloj guardado = relojRepository.save(r);
+            return fhirParser.encodeResourceToString(convertirAFhir(guardado));
+        }
+        return null;
+    }
+
+    public boolean eliminar(Long id) {
+        if (relojRepository.existsById(id)) {
+            relojRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    // TRADUCTOR FHIR: Reloj (Java) -> Device (FHIR)
+    private Device convertirAFhir(Reloj miReloj) {
+        Device fhirDevice = new Device();
+        fhirDevice.setId(miReloj.getId().toString());
+
+        // IMEI
+        fhirDevice.addIdentifier()
+            .setSystem("urn:gsma:imei")
+            .setValue(miReloj.getImei());
+
+        // MAC ADDRESS
+        fhirDevice.addIdentifier()
+            .setSystem("urn:ieee:mac")
+            .setValue(miReloj.getMacAddress());
+
+        // Etat de la batterie (on l'ajoute comme une note ou un nom de modèle)
+        fhirDevice.setDeviceName(List.of(new Device.DeviceDeviceNameComponent()
+            .setName("Batería: " + miReloj.getBateriaActual() + "%")
+            .setType(Device.DeviceNameType.OTHER)));
+
+        return fhirDevice;
+    }
+}

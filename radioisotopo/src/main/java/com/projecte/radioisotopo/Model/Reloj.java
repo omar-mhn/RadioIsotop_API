@@ -23,7 +23,7 @@ public class Reloj {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_reloj")
-    private EstadoReloj estado;
+    private EstadoReloj estadoReloj;
 
     @Column(name = "bateria_actual")
     private int bateriaActual;
@@ -32,7 +32,7 @@ public class Reloj {
         this.id = id;
         this.imei = imei;
         this.macAddress = macAddress;
-        this.estado = estadoReloj;
+        this.estadoReloj = estadoReloj;
         this.bateriaActual = bateriaActual;
     }
 
@@ -64,11 +64,11 @@ public class Reloj {
     }
 
     public EstadoReloj getEstadoReloj() {
-        return estado;
+        return estadoReloj;
     }
 
-    public void setEstadoReoj(EstadoReloj estado) {
-        this.estado = estado;
+    public void setEstadoReloj(EstadoReloj estado) {
+        this.estadoReloj = estado;
     }
 
     public int getBateriaActual() {
