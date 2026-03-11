@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS Departamento (
     nombre VARCHAR(100) NOT NULL UNIQUE,
     centro VARCHAR(50) NOT NULL,
     ubicacion VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL UNIQUE
+    email VARCHAR(100) NOT NULL UNIQUE,
+    activo BOOLEAN DEFAULT TRUE
 );
 
 -- TABLA DOCTOR
@@ -17,7 +18,9 @@ CREATE TABLE IF NOT EXISTS Doctor (
     email VARCHAR(100) NOT NULL UNIQUE,
     num_colegiado VARCHAR(50),
     rol ENUM('Doctor', 'Admin') NOT NULL,
+    foto_perfil VARCHAR(255),
     id_departamento INT,
+    activo BOOLEAN DEFAULT TRUE,
     CONSTRAINT fk_doctor_departamento
         FOREIGN KEY(id_departamento)
         REFERENCES Departamento(id)
@@ -36,9 +39,11 @@ CREATE TABLE IF NOT EXISTS Paciente (
     dni VARCHAR(20) NOT NULL UNIQUE,
     tarjeta_sanitaria VARCHAR(50) UNIQUE,
     fecha_nacimiento DATE,
+    foto_perfil VARCHAR(255),
     peso DECIMAL(5,2),
     altura DECIMAL(5,2),
     id_departamento INT,
+    activo BOOLEAN DEFAULT TRUE,
     CONSTRAINT fk_paciente_departamento
         FOREIGN KEY (id_departamento)
         REFERENCES Departamento(id)
@@ -55,7 +60,8 @@ CREATE TABLE IF NOT EXISTS Familiar (
     num_telefono VARCHAR(20) NOT NULL UNIQUE,
     email VARCHAR(100),
     dni VARCHAR(20) NOT NULL UNIQUE,
-    tarjeta_sanitaria VARCHAR(50) UNIQUE
+    tarjeta_sanitaria VARCHAR(50) UNIQUE,
+    activo BOOLEAN DEFAULT TRUE
 );
 
 
@@ -83,7 +89,8 @@ CREATE TABLE IF NOT EXISTS Reloj (
     imei VARCHAR(50) UNIQUE NOT NULL,
     mac_address VARCHAR(50) UNIQUE NOT NULL,
     estado_reloj ENUM('Disponible', 'Asignado', 'En_Mantenimiento') NOT NULL,
-    bateria_actual INT NOT NULL
+    bateria_actual INT NOT NULL,
+    activo BOOLEAN DEFAULT TRUE
 );
 
 
@@ -96,9 +103,10 @@ CREATE TABLE IF NOT EXISTS Tratamientos (
     id_reloj INT NOT NULL,
     tipo_isotopo VARCHAR(50) NOT NULL,
     dosis_inicial DECIMAL(10,2) NOT NULL,
-    fecha_administracion DATE NOT NULL,
-    fecha_final_estimada DATE,
+    fecha_administracion DATETIME NOT NULL,
+    fecha_final_estimada DATETIME,
     estado_tratamiento ENUM('Activo', 'Finalizado', 'Cancelado') NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
     CONSTRAINT fk_tratamiento_paciente
         FOREIGN KEY (id_paciente)
         REFERENCES Paciente(id)
