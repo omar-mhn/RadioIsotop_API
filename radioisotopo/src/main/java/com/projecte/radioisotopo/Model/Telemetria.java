@@ -4,8 +4,10 @@
 
     import java.sql.Timestamp;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
-    import jakarta.persistence.Column;
+import jakarta.persistence.Column;
     import jakarta.persistence.Entity;
     import jakarta.persistence.GeneratedValue;
     import jakarta.persistence.GenerationType;
@@ -16,6 +18,8 @@
 
     @Entity
     @Table(name="Telemetria")
+    @SQLDelete(sql = "UPDATE telemetria SET activo = false WHERE id = ?")
+    @SQLRestriction("activo = true")
     public class Telemetria {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +40,9 @@
         @Column(name = "radiacion_actual", nullable = false)
         private double radiacionActual;
 
+        @Column(nullable = false)
+        private boolean activo = true;
+
         @ManyToOne
         @JoinColumn(name="id_tratamiento",nullable = false)
         private Tratamiento tratamiento;
@@ -49,6 +56,7 @@
             this.temperatura = temperatura;
             this.radiacionActual = radiacionActual;
             this.tratamiento = tratamiento;
+            this.activo =true;
         }
 
         public Telemetria() {
@@ -110,6 +118,15 @@
             this.tratamiento = tratamiento;
         }
 
+        public boolean isActivo() {
+            return activo;
+        }
+
+        public void setActivo(boolean activo) {
+            this.activo = activo;
+        }
+
+        
         
 
     }

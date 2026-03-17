@@ -7,7 +7,6 @@ import com.projecte.radioisotopo.Repository.DepartamentoRepository;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Organization;
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +20,8 @@ public class DepartamentoService {
     @Autowired
     private DepartamentoRepository departamentoRepository;
 
-    private final IParser fhirParser;
-
-    public DepartamentoService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
+    @Autowired
+    private IParser fhirParser;
 
     // Create
     public String crearDepartamento(Departamento dep) {

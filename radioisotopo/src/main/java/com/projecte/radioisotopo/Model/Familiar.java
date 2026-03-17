@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="Familiar")
@@ -51,6 +52,7 @@ public class Familiar {
     // porque allí ya están todas las reglas de la tabla "Contacto".
 
     @ManyToMany(mappedBy = "familiares")
+    @JsonIgnore
     private List<Paciente> pacientes; // Una lista porque son "Muchos" pacientes
 
     

@@ -3,7 +3,10 @@
 
     import java.sql.Timestamp;
 
-    import jakarta.persistence.Column;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+import jakarta.persistence.Column;
     import jakarta.persistence.Entity;
     import jakarta.persistence.EnumType;
     import jakarta.persistence.Enumerated;
@@ -16,6 +19,8 @@ import jakarta.persistence.ManyToOne;
 
     @Entity
     @Table(name="Tratamientos")
+    @SQLDelete(sql = "UPDATE tratamientos SET activo = false WHERE id = ?")
+    @SQLRestriction("activo = true")
     public class Tratamiento {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +42,8 @@ import jakarta.persistence.ManyToOne;
         @Column(name = "estado_tratamiento")
         private EstadoTratamiento estadoTratamiento;
 
+        @Column(nullable = false)
+        private boolean activo = true;
 
         @ManyToOne()
         @JoinColumn(name = "id_paciente",nullable = false)
@@ -64,6 +71,7 @@ import jakarta.persistence.ManyToOne;
             this.paciente = paciente;
             this.reloj = reloj;
             this.doctor = doctor;
+            this.activo = true;
         }
 
         public Tratamiento() {
@@ -139,6 +147,14 @@ import jakarta.persistence.ManyToOne;
 
         public void setDoctor(Doctor doctor) {
             this.doctor = doctor;
+        }
+
+        public boolean isActivo() {
+            return activo;
+        }
+
+        public void setActivo(boolean activo) {
+            this.activo = activo;
         }
         
         

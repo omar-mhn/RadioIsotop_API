@@ -14,7 +14,6 @@ import com.projecte.radioisotopo.Model.Familiar;
 import com.projecte.radioisotopo.Model.Paciente;
 import com.projecte.radioisotopo.Repository.PacienteRepository;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -23,12 +22,9 @@ public class PacienteService {
     @Autowired 
     PacienteRepository pacienteRepository;
 
-    private final IParser fhirParser;
+    @Autowired
+    private IParser fhirParser;
 
-    public PacienteService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
     // Crear un nuevo paciente
     public String createPacient(Paciente nuevoPaciente){
         Paciente pacienteGuardado = pacienteRepository.save(nuevoPaciente);
