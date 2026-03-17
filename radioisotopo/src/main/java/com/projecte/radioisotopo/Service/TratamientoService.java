@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import com.projecte.radioisotopo.Model.Tratamiento;
 import com.projecte.radioisotopo.Repository.TratamientoRepository;
 
-import ca.uhn.fhir.context.FhirContext;
+
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -23,12 +23,8 @@ public class TratamientoService {
     @Autowired
     private TratamientoRepository tratamientoRepository;
 
-    private final IParser fhirParser;
-
-    public TratamientoService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
+    @Autowired
+    private IParser fhirParser;
 
     // Crear un nuevo tratamiento (CarePlan)
     public String crearTratamiento(Tratamiento t) {
@@ -88,8 +84,22 @@ public class TratamientoService {
         CarePlan cp = new CarePlan();
         cp.setId(t.getId().toString());
 
-        // Estado y Propósito
-        cp.setStatus(CarePlan.CarePlanStatus.ACTIVE);
+        // Estado y Propósito (Mapeo dinámico)
+        if (t.getEstadoTratamiento() != null) {
+            switch (t.getEstadoTratamiento()) {
+                case Activo:
+                    cp.setStatus(CarePlan.CarePlanStatus.ACTIVE);
+                    break;
+                case Finalizado:
+                    cp.setStatus(CarePlan.CarePlanStatus.COMPLETED);
+                    break;
+                case Cancelado:
+                    cp.setStatus(CarePlan.CarePlanStatus.REVOKED);
+                    break;
+            }
+        } else {
+            cp.setStatus(CarePlan.CarePlanStatus.UNKNOWN);
+        }
         cp.setIntent(CarePlan.CarePlanIntent.PLAN);
         cp.setTitle("Tratamiento de Radioisótopo: " + t.getTipoIsotopo());
 

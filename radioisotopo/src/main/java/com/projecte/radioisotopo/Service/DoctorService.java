@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.projecte.radioisotopo.Model.Doctor;
 import com.projecte.radioisotopo.Repository.DoctorRepository;
 
-import ca.uhn.fhir.context.FhirContext;
+
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -22,13 +22,9 @@ public class DoctorService {
     @Autowired 
     DoctorRepository doctorRepository;
 
-    private final IParser fhirParser;
+    @Autowired
+    private IParser fhirParser;
 
-    
-    public DoctorService(){
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
     // create
     public String crearDoctor(Doctor newDoctor){
         Doctor doctorGuardado = doctorRepository.save(newDoctor);

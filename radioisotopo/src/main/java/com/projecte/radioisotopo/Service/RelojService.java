@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.projecte.radioisotopo.Model.Reloj;
 import com.projecte.radioisotopo.Repository.RelojRepository;
-import ca.uhn.fhir.context.FhirContext;
+
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -17,12 +17,9 @@ public class RelojService {
     @Autowired
     private RelojRepository relojRepository;
 
-    private final IParser fhirParser;
+    @Autowired
+    private IParser fhirParser;
 
-    public RelojService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
     // Create
     public String crearReloj(Reloj newReloj) {
         Reloj guardado = relojRepository.save(newReloj);

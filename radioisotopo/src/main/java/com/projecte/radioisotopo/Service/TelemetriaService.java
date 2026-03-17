@@ -1,12 +1,13 @@
 package com.projecte.radioisotopo.Service;
 
+
 import java.util.List;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.projecte.radioisotopo.Model.Telemetria;
 import com.projecte.radioisotopo.Repository.TelemetriaRepository;
-import ca.uhn.fhir.context.FhirContext;
+
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -15,12 +16,8 @@ public class TelemetriaService {
     @Autowired
     private TelemetriaRepository telemetriaRepository;
 
-    private final IParser fhirParser;
-
-    public TelemetriaService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
+    @Autowired
+    private IParser fhirParser;
 
     // Registrar una nueva lectura de la pulsera
     public String registrarDato(Telemetria t) {
@@ -39,7 +36,6 @@ public class TelemetriaService {
         return fhirParser.encodeResourceToString(bundle);
     }
 
-    
     // TRADUCTOR FHIR: Telemetria -> Observation (Vital Signs)
    
     private Observation convertirAFhir(Telemetria t) {
@@ -68,9 +64,16 @@ public class TelemetriaService {
             heartRate.setValue(new Quantity().setValue(t.getFrecuenciaCardiaca()).setUnit("bpm"));
         }
 
+        // Componente: Temperatura
+        if (t.getTemperatura() != null) {
+            Observation.ObservationComponentComponent temp = obs.addComponent();
+            temp.getCode().addCoding().setSystem("http://loinc.org").setCode("8310-5").setDisplay("Body temperature");
+            temp.setValue(new Quantity().setValue(t.getTemperatura()).setUnit("Cel"));
+        }
+
         // Componente: Radiación Actual (Dato clave de tu proyecto)
         Observation.ObservationComponentComponent radiation = obs.addComponent();
-        radiation.getCode().addCoding().setSystem("http://loinc.org").setCode("8302-2").setDisplay("Radiation level");
+        radiation.getCode().addCoding().setSystem("http://loinc.org").setCode("93006-5").setDisplay("Radiation level");
         radiation.setValue(new Quantity().setValue(t.getRadiacionActual()).setUnit("µSv/h"));
 
         // Componente: Pasos Acumulados
