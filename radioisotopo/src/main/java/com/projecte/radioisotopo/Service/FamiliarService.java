@@ -54,7 +54,8 @@ public class FamiliarService {
             f.setApellido(detalles.getApellido());
             f.setNumTelefono(detalles.getNumTelefono());
             f.setEmail(detalles.getEmail());
-            f.setDni(detalles.getDni());
+            f.setNumDocumento(detalles.getNumDocumento());
+            f.setTipoDocumento(detalles.getTipoDocumento());
             f.setTarjetaSanitaria(detalles.getTarjetaSanitaria());
             
             return fhirParser.encodeResourceToString(convertirAFhir(familiarRepository.save(f)));
@@ -70,15 +71,25 @@ public class FamiliarService {
         }
         return false;
     }
-    // Traducteur FHIR
+    // Traductor FHIR
     private RelatedPerson convertirAFhir(Familiar fam) {
         RelatedPerson fhirFam = new RelatedPerson();
         fhirFam.setId(fam.getId().toString());
 
-        // Identifiants (DNI et Carte Sanitaire)
-        fhirFam.addIdentifier().setSystem("urn:oid:dni").setValue(fam.getDni());
+        // Identifiants (DNI y tarjeta sanitaria)
+        String systemUri = "urn:oid:2.16.840.1.113883.2.9.2.30"; 
+        if (fam.getTipoDocumento() != null && fam.getTipoDocumento().equalsIgnoreCase("PASAPORTE")) {
+            systemUri = "http://hl7.org/fhir/sid/passport-esp"; 
+        }
+
+        fhirFam.addIdentifier()
+            .setSystem(systemUri)
+            .setValue(fam.getNumDocumento());
+
         if (fam.getTarjetaSanitaria() != null) {
-            fhirFam.addIdentifier().setSystem("urn:oid:ts").setValue(fam.getTarjetaSanitaria());
+            fhirFam.addIdentifier()
+                .setSystem("urn:oid:2.16.724.4.40")
+                .setValue(fam.getTarjetaSanitaria());
         }
 
         // Nom

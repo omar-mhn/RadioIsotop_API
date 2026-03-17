@@ -27,7 +27,7 @@ public class PacienteController {
     @PostMapping(value = "/pacientes", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> crearPaciente(@RequestBody Paciente nuevoPaciente) {
         String fhirJson = pacienteService.createPacient(nuevoPaciente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(fhirJson);
+        return ResponseEntity.status(HttpStatus.CREATED).body("patient created");
     }
 
     @GetMapping(value = "/pacientes", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -36,7 +36,8 @@ CREATE TABLE IF NOT EXISTS Paciente (
     apellido VARCHAR(100) NOT NULL,
     num_telefono VARCHAR(20) NOT NULL UNIQUE,
     email VARCHAR(100),
-    dni VARCHAR(20) NOT NULL UNIQUE,
+    num_documento VARCHAR(20) NOT NULL UNIQUE, 
+    tipo_documento VARCHAR(50) NOT NULL,
     tarjeta_sanitaria VARCHAR(50) UNIQUE,
     fecha_nacimiento DATE,
     foto_perfil VARCHAR(255),
@@ -59,7 +60,8 @@ CREATE TABLE IF NOT EXISTS Familiar (
     apellido VARCHAR(100) NOT NULL,
     num_telefono VARCHAR(20) NOT NULL UNIQUE,
     email VARCHAR(100),
-    dni VARCHAR(20) NOT NULL UNIQUE,
+    num_documento VARCHAR(20) NOT NULL UNIQUE,
+    tipo_documento VARCHAR(50) NOT NULL,
     tarjeta_sanitaria VARCHAR(50) UNIQUE,
     activo BOOLEAN DEFAULT TRUE
 );

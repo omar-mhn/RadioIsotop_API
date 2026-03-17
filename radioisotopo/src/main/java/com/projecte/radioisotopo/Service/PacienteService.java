@@ -74,11 +74,13 @@ public class PacienteService {
             pacienteExistente.setApellido(detallesActualizados.getApellido());
             pacienteExistente.setNumTelefono(detallesActualizados.getNumTelefono());
             pacienteExistente.setEmail(detallesActualizados.getEmail());
-            pacienteExistente.setDni(detallesActualizados.getDni());
+            pacienteExistente.setNumDocumento(detallesActualizados.getNumDocumento());
+            pacienteExistente.setTipoDocumento(detallesActualizados.getTipoDocumento());
             pacienteExistente.setTarjetaSanitaria(detallesActualizados.getTarjetaSanitaria());
             pacienteExistente.setFechaNacimiento(detallesActualizados.getFechaNacimiento());
             pacienteExistente.setPeso(detallesActualizados.getPeso());
             pacienteExistente.setAltura(detallesActualizados.getAltura());
+            pacienteExistente.setFotoPerfil(detallesActualizados.getFotoPerfil());
             
             // Actualizamos el departamento y los familiares
             pacienteExistente.setDepartamento(detallesActualizados.getDepartamento());
@@ -105,10 +107,17 @@ public class PacienteService {
         // Asigna el ID de la base de datos al recurso FHIR
         fhirPatient.setId(miPaciente.getId().toString());
         
-        // DNI
-        fhirPatient.addIdentifier()
-            .setSystem("urn:oid:2.16.840.1.113883.2.9.2.30")
-            .setValue(miPaciente.getDni());
+        // DNI or Passeport
+        String systemUri = "urn:oid:2.16.840.1.113883.2.9.2.30";// (DNI)
+    
+        if (miPaciente.getTipoDocumento() != null && 
+            miPaciente.getTipoDocumento().equalsIgnoreCase("PASAPORTE")) {
+            systemUri = "http://hl7.org/fhir/sid/passport-esp"; // URI for Passeport
+    }
+
+    fhirPatient.addIdentifier()
+        .setSystem(systemUri)
+        .setValue(miPaciente.getNumDocumento());
             
         // Tarjeta Sanitaria (Solo si la tiene registrada)
         if (miPaciente.getTarjetaSanitaria() != null) {
@@ -132,6 +141,10 @@ public class PacienteService {
             fhirPatient.addTelecom()
                 .setSystem(ContactPoint.ContactPointSystem.EMAIL)
                 .setValue(miPaciente.getEmail());
+        }
+        // foto perfil
+        if (miPaciente.getFotoPerfil() != null) {
+            fhirPatient.addPhoto().setUrl(miPaciente.getFotoPerfil());
         }
 
         // Fecha de Nacimiento

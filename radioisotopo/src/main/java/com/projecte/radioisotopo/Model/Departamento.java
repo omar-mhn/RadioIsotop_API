@@ -5,10 +5,16 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "Departamento")
+@SQLDelete(sql = "UPDATE departamento SET activo = false WHERE id = ?")
+@SQLRestriction("activo = true")
 public class Departamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +32,9 @@ public class Departamento {
     @Column(length = 100, nullable = false,unique = true)
     private String email;
 
+    @Column(nullable = false)
+    private boolean activo = true;
+
     
 
     public Departamento() {
@@ -37,6 +46,7 @@ public class Departamento {
         this.centro = centro;
         this.ubicacion = ubicacion;
         this.email = email;
+        this.activo = true;
     }
 
     public Long getId() {
@@ -78,4 +88,14 @@ public class Departamento {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    
 }

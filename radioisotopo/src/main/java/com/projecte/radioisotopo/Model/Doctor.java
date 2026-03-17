@@ -8,10 +8,16 @@
         import jakarta.persistence.ManyToOne;
         import jakarta.persistence.GeneratedValue;
         import jakarta.persistence.GenerationType;
-        import jakarta.persistence.Column;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+import jakarta.persistence.Column;
 
         @Entity
         @Table(name ="Doctor")
+        @SQLDelete(sql = "UPDATE doctor SET activo = false WHERE id = ?")
+        @SQLRestriction("activo = true")
         public class Doctor {
             @Id
             @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,23 +39,33 @@
             @Column(nullable = false)
             private RolDoctor rol;
 
+            @Column(name = "foto_perfil") 
+            private String fotoPerfil;
+
+            @Column(nullable = false)
+            private boolean activo = true;
+
             @ManyToOne
             @JoinColumn(name = "id_departamento")
             private Departamento departamento;
 
             
 
-            public Doctor(Long id, String nombre, String apellido, String email, String num_colegiado, RolDoctor rol,
-                    Departamento departamento) {
+            
+
+            public Doctor(Long id, String nombre, String apellido, String email, String numColegiado, RolDoctor rol,
+                    String fotoPerfil, boolean activo, Departamento departamento) {
                 this.id = id;
                 this.nombre = nombre;
                 this.apellido = apellido;
                 this.email = email;
-                this.numColegiado = num_colegiado;
+                this.numColegiado = numColegiado;
                 this.rol = rol;
+                this.fotoPerfil = fotoPerfil;
+                this.activo = activo;
                 this.departamento = departamento;
+                this.activo = true;
             }
-
             public Doctor() {
             }
             public Long getId() {
@@ -106,6 +122,20 @@
 
             public void setDepartamento(Departamento departamento) {
                 this.departamento = departamento;
+            }
+
+            public boolean isActivo() {
+                return activo;
+            }
+
+            public void setActivo(boolean activo) {
+                this.activo = activo;
+            }
+            public String getFotoPerfil() {
+                return fotoPerfil;
+            }
+            public void setFotoPerfil(String fotoPerfil) {
+                this.fotoPerfil = fotoPerfil;
             }
             
             

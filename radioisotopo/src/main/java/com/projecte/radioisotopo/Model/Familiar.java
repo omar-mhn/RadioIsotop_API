@@ -2,6 +2,9 @@ package com.projecte.radioisotopo.Model;
 
 import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +15,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="Familiar")
+@SQLDelete(sql = "UPDATE familiar SET activo = false WHERE id = ?")
+@SQLRestriction("activo = true")
 public class Familiar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,11 +35,17 @@ public class Familiar {
     @Column(length = 100)
     private String email;
 
-    @Column(length = 20, nullable = false,unique = true)
-    private String dni;
+    @Column(name = "num_documento", length = 20, nullable = false, unique = true)
+    private String numDocumento; 
+
+    @Column(name = "tipo_documento")
+    private String tipoDocumento;
 
     @Column(name="tarjeta_sanitaria",length = 50,unique = true)
     private String tarjetaSanitaria;
+    
+    @Column(nullable = false)
+    private boolean activo = true;
 
     // Le decimos que mire la variable "familiares" que acabamos de crear en la clase Paciente,
     // porque allí ya están todas las reglas de la tabla "Contacto".
@@ -42,15 +53,20 @@ public class Familiar {
     @ManyToMany(mappedBy = "familiares")
     private List<Paciente> pacientes; // Una lista porque son "Muchos" pacientes
 
-    public Familiar(Long id, String nombre, String apellido, String numTelefono, String email, String dni,
-            String tarjetaSanitaria) {
+    
+
+    public Familiar(Long id, String nombre, String apellido, String numTelefono, String email, String numDocumento,
+            String tipoDocumento, String tarjetaSanitaria, List<Paciente> pacientes) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.numTelefono = numTelefono;
         this.email = email;
-        this.dni = dni;
+        this.numDocumento = numDocumento;
+        this.tipoDocumento = tipoDocumento;
         this.tarjetaSanitaria = tarjetaSanitaria;
+        this.pacientes = pacientes;
+        this.activo = true;
     }
 
     public Familiar() {
@@ -96,12 +112,30 @@ public class Familiar {
         this.email = email;
     }
 
-    public String getDni() {
-        return dni;
+    
+
+    public String getNumDocumento() {
+        return numDocumento;
     }
 
-    public void setDni(String dni) {
-        this.dni = dni;
+    public void setNumDocumento(String numDocumento) {
+        this.numDocumento = numDocumento;
+    }
+
+    public String getTipoDocumento() {
+        return tipoDocumento;
+    }
+
+    public void setTipoDocumento(String tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
+    }
+
+    public List<Paciente> getPacientes() {
+        return pacientes;
+    }
+
+    public void setPacientes(List<Paciente> pacientes) {
+        this.pacientes = pacientes;
     }
 
     public String getTarjetaSanitaria() {
@@ -110,6 +144,14 @@ public class Familiar {
 
     public void setTarjetaSanitaria(String tarjetaSanitaria) {
         this.tarjetaSanitaria = tarjetaSanitaria;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
     
 }

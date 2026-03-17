@@ -4,6 +4,9 @@ package com.projecte.radioisotopo.Model;
 import java.sql.Date;
 import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,6 +20,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name ="Paciente")
+@SQLDelete(sql = "UPDATE paciente SET activo = false WHERE id = ?")
+@SQLRestriction("activo = true")
 public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,18 +36,26 @@ public class Paciente {
     @Column(name = "num_telefono" ,length = 20, nullable = false,unique = true)
     private String numTelefono;
 
-
     @Column()
     private String email;
 
-    @Column(length = 20, nullable = false,unique = true)
-    private String dni;
+    @Column(name = "num_documento", length = 20, nullable = false, unique = true)
+    private String numDocumento; 
 
+    @Column(name = "tipo_documento")
+    private String tipoDocumento;
+    
     @Column(name = "tarjeta_sanitaria",length = 25,unique = true)
     private String tarjetaSanitaria;
 
     @Column(name = "fecha_nacimiento")
     private Date fechaNacimiento;
+
+    @Column(name = "foto_perfil") 
+    private String fotoPerfil;
+
+    @Column(nullable = false)
+    private boolean activo = true;
 
     @Column
     private Double peso;
@@ -54,6 +67,8 @@ public class Paciente {
     @JoinColumn(name = "id_departamento")
     private Departamento departamento;
 
+
+
     
     @ManyToMany
     @JoinTable(
@@ -64,21 +79,28 @@ public class Paciente {
     private List<Familiar> familiares; // Una lista porque son "Muchos" familiares
 
 
-    public Paciente(Long id, String nombre, String apellido, String numTelefono, String email, String dni,
-            String tarjetaSanitaria, Date fechaNacimiento, Double peso, Double altura, Departamento departamento,
-            List<Familiar> familiares) {
+   
+
+    
+
+    public Paciente(Long id, String nombre, String apellido, String numTelefono, String email, String numDocumento,
+            String tipoDocumento, String tarjetaSanitaria, Date fechaNacimiento, String fotoPerfil, Double peso,
+            Double altura, Departamento departamento, List<Familiar> familiares) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.numTelefono = numTelefono;
         this.email = email;
-        this.dni = dni;
+        this.numDocumento = numDocumento;
+        this.tipoDocumento = tipoDocumento;
         this.tarjetaSanitaria = tarjetaSanitaria;
         this.fechaNacimiento = fechaNacimiento;
+        this.fotoPerfil = fotoPerfil;
         this.peso = peso;
         this.altura = altura;
         this.departamento = departamento;
         this.familiares = familiares;
+        this.activo = true;
     }
 
     public Paciente() {
@@ -123,15 +145,6 @@ public class Paciente {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    public String getDni() {
-        return dni;
-    }
-
-    public void setDni(String dni) {
-        this.dni = dni;
-    }
-
     public String getTarjetaSanitaria() {
         return tarjetaSanitaria;
     }
@@ -179,5 +192,39 @@ public class Paciente {
     public void setFamiliares(List<Familiar> familiares) {
         this.familiares = familiares;
     }
+
+    public String getNumDocumento() {
+        return numDocumento;
+    }
+
+    public void setNumDocumento(String numDocumento) {
+        this.numDocumento = numDocumento;
+    }
+
+    public String getTipoDocumento() {
+        return tipoDocumento;
+    }
+
+    public void setTipoDocumento(String tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
+    }
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+    
+    
     
 }

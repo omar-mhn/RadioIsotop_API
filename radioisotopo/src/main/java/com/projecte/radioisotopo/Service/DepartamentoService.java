@@ -60,6 +60,7 @@ public class DepartamentoService {
             depExistente.setCentro(detallesActualizados.getCentro());
             depExistente.setUbicacion(detallesActualizados.getUbicacion());
             depExistente.setEmail(detallesActualizados.getEmail());
+            
 
             
             Departamento depActualizado = departamentoRepository.save(depExistente);
