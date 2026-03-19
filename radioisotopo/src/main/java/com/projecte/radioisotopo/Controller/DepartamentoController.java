@@ -19,7 +19,7 @@ public class DepartamentoController {
     @PostMapping(value = "/departamentos",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> crearDepartamento(@RequestBody Departamento dep) {
         String fhirJson = departamentoService.crearDepartamento(dep);
-        return ResponseEntity.status(HttpStatus.CREATED).body(fhirJson);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Departamento creado!");
     }
 
     @GetMapping(value = "/departamentos",produces = MediaType.APPLICATION_JSON_VALUE)

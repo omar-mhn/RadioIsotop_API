@@ -40,12 +40,11 @@ public class Departamento {
     public Departamento() {
     }
 
-    public Departamento(Long id, String nombre, String centro, String ubicacion, String email) {
-        this.id = id;
+    public Departamento(String nombre, String centro, String ubicacion, String email) {
         this.nombre = nombre;
         this.centro = centro;
         this.ubicacion = ubicacion;
-        this.email = email;
+        this.email = email; 
         this.activo = true;
     }
 
