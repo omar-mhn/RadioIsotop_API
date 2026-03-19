@@ -13,7 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 @Entity
 @Table(name= "Reloj")
-@SQLDelete(sql = "UPDATE reloj SET activo = false WHERE id = ?")
+@SQLDelete(sql = "UPDATE Reloj SET activo = false WHERE id = ?")
 @SQLRestriction("activo = true")
 public class Reloj {
    @Id
@@ -36,8 +36,8 @@ public class Reloj {
     @Column(nullable = false)
     private boolean activo = true;
 
-    public Reloj(Long id, String imei, String macAddress, EstadoReloj estadoReloj, int bateriaActual) {
-        this.id = id;
+    public Reloj(String imei, String macAddress, EstadoReloj estadoReloj, int bateriaActual) {
+        
         this.imei = imei;
         this.macAddress = macAddress;
         this.estadoReloj = estadoReloj;
