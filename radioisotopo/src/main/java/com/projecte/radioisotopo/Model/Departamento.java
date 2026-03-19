@@ -13,7 +13,7 @@ import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "Departamento")
-@SQLDelete(sql = "UPDATE departamento SET activo = false WHERE id = ?")
+@SQLDelete(sql = "UPDATE Departamento SET activo = false WHERE id = ?")
 @SQLRestriction("activo = true")
 public class Departamento {
     @Id
