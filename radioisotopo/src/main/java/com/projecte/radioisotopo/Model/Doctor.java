@@ -16,7 +16,7 @@ import jakarta.persistence.Column;
 
         @Entity
         @Table(name ="Doctor")
-        @SQLDelete(sql = "UPDATE doctor SET activo = false WHERE id = ?")
+        @SQLDelete(sql = "UPDATE Doctor SET activo = false WHERE id = ?")
         @SQLRestriction("activo = true")
         public class Doctor {
             @Id
@@ -53,16 +53,14 @@ import jakarta.persistence.Column;
 
             
 
-            public Doctor(Long id, String nombre, String apellido, String email, String numColegiado, RolDoctor rol,
-                    String fotoPerfil, boolean activo, Departamento departamento) {
-                this.id = id;
+            public Doctor( String nombre, String apellido, String email, String numColegiado, RolDoctor rol,
+                    String fotoPerfil, Departamento departamento) {
                 this.nombre = nombre;
                 this.apellido = apellido;
                 this.email = email;
                 this.numColegiado = numColegiado;
                 this.rol = rol;
                 this.fotoPerfil = fotoPerfil;
-                this.activo = activo;
                 this.departamento = departamento;
                 this.activo = true;
             }

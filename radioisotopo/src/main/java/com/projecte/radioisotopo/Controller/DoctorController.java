@@ -25,7 +25,7 @@ public class DoctorController {
     @PostMapping(value = "/doctores", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> crearDoctor(@RequestBody Doctor nuevoDoctor) {
         String fhirJson = doctorService.crearDoctor(nuevoDoctor);
-        return ResponseEntity.status(HttpStatus.CREATED).body(fhirJson);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Doctor Creado !");
     }
 
     
@@ -53,8 +53,6 @@ public class DoctorController {
         }
         return ResponseEntity.notFound().build();
     }
-
-    
     @DeleteMapping("/doctores/{id}")
     public ResponseEntity<Void> eliminarDoctor(@PathVariable Long id) {
         if (doctorService.eliminarDoctor(id)) {
