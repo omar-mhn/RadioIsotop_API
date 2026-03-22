@@ -134,6 +134,7 @@ CREATE TABLE IF NOT EXISTS Telemetria (
     pasos_acumulados INT NOT NULL,
     temperatura DECIMAL(4,2),
     radiacion_actual DECIMAL(10,4) NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
     CONSTRAINT fk_telemetria_tratamiento
         FOREIGN KEY (id_tratamiento)
         REFERENCES Tratamientos(id)
