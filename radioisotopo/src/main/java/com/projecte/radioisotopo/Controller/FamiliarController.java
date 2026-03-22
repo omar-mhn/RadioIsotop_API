@@ -19,7 +19,7 @@ public class FamiliarController {
     @PostMapping(value = "/familiares", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> crearFamiliar(@RequestBody Familiar nuevoFamiliar) {
         String fhirJson = familiarService.crearFamiliar(nuevoFamiliar);
-        return ResponseEntity.status(HttpStatus.CREATED).body(fhirJson);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Familiar creado !");
     }
 
     // 2. READ ALL - GET /api/familiares

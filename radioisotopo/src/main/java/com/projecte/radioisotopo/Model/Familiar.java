@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="Familiar")
-@SQLDelete(sql = "UPDATE familiar SET activo = false WHERE id = ?")
+@SQLDelete(sql = "UPDATE Familiar SET activo = false WHERE id = ?")
 @SQLRestriction("activo = true")
 public class Familiar {
     @Id
@@ -57,9 +57,9 @@ public class Familiar {
 
     
 
-    public Familiar(Long id, String nombre, String apellido, String numTelefono, String email, String numDocumento,
+    public Familiar( String nombre, String apellido, String numTelefono, String email, String numDocumento,
             String tipoDocumento, String tarjetaSanitaria, List<Paciente> pacientes) {
-        this.id = id;
+        
         this.nombre = nombre;
         this.apellido = apellido;
         this.numTelefono = numTelefono;

@@ -18,7 +18,7 @@ import jakarta.persistence.Column;
 
     @Entity
     @Table(name="Telemetria")
-    @SQLDelete(sql = "UPDATE telemetria SET activo = false WHERE id = ?")
+    @SQLDelete(sql = "UPDATE Telemetria SET activo = false WHERE id = ?")
     @SQLRestriction("activo = true")
     public class Telemetria {
         @Id
@@ -47,9 +47,8 @@ import jakarta.persistence.Column;
         @JoinColumn(name="id_tratamiento",nullable = false)
         private Tratamiento tratamiento;
 
-        public Telemetria(Long id, Timestamp fechaHora, Integer frecuenciaCardiaca, int pasosAcumulados,
+        public Telemetria(Timestamp fechaHora, Integer frecuenciaCardiaca, int pasosAcumulados,
                 Double temperatura, double radiacionActual, Tratamiento tratamiento) {
-            this.id = id;
             this.fechaHora = fechaHora;
             this.frecuenciaCardiaca = frecuenciaCardiaca;
             this.pasosAcumulados = pasosAcumulados;

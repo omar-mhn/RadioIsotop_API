@@ -20,7 +20,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name ="Paciente")
-@SQLDelete(sql = "UPDATE paciente SET activo = false WHERE id = ?")
+@SQLDelete(sql = "UPDATE Paciente SET activo = false WHERE id = ?")
 @SQLRestriction("activo = true")
 public class Paciente {
     @Id
@@ -83,10 +83,9 @@ public class Paciente {
 
     
 
-    public Paciente(Long id, String nombre, String apellido, String numTelefono, String email, String numDocumento,
+    public Paciente(String nombre, String apellido, String numTelefono, String email, String numDocumento,
             String tipoDocumento, String tarjetaSanitaria, Date fechaNacimiento, String fotoPerfil, Double peso,
             Double altura, Departamento departamento, List<Familiar> familiares) {
-        this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.numTelefono = numTelefono;

@@ -19,7 +19,7 @@ import jakarta.persistence.ManyToOne;
 
     @Entity
     @Table(name="Tratamientos")
-    @SQLDelete(sql = "UPDATE tratamientos SET activo = false WHERE id = ?")
+    @SQLDelete(sql = "UPDATE Tratamientos SET activo = false WHERE id = ?")
     @SQLRestriction("activo = true")
     public class Tratamiento {
         @Id
@@ -30,7 +30,7 @@ import jakarta.persistence.ManyToOne;
         private String tipoIsotopo;
 
         @Column(name = "dosis_inicial",nullable = false)
-        private double dosisInicial;
+        private Double dosisInicial;
 
         @Column(name="fecha_administracion",nullable = false)
         private Timestamp fechaAdministracion;
@@ -59,10 +59,9 @@ import jakarta.persistence.ManyToOne;
 
         
 
-        public Tratamiento(Long id, String tipoIsotopo, double dosisInicial, Timestamp fechaAdministracion,
+        public Tratamiento(String tipoIsotopo, Double dosisInicial, Timestamp fechaAdministracion,
                 Timestamp fechaFinalEstimada, EstadoTratamiento estadoTratamiento, Paciente paciente, Reloj reloj,
                 Doctor doctor) {
-            this.id = id;
             this.tipoIsotopo = tipoIsotopo;
             this.dosisInicial = dosisInicial;
             this.fechaAdministracion = fechaAdministracion;
@@ -93,11 +92,11 @@ import jakarta.persistence.ManyToOne;
             this.tipoIsotopo = tipoIsotopo;
         }
 
-        public double getDosisInicial() {
+        public Double getDosisInicial() {
             return dosisInicial;
         }
 
-        public void setDosisInicial(double dosisInicial) {
+        public void setDosisInicial(Double dosisInicial) {
             this.dosisInicial = dosisInicial;
         }
 
