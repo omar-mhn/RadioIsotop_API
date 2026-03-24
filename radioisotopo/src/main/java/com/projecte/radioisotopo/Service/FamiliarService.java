@@ -50,7 +50,6 @@ public class FamiliarService {
             f.setNombre(detalles.getNombre());
             f.setApellido(detalles.getApellido());
             f.setNumTelefono(detalles.getNumTelefono());
-            f.setEmail(detalles.getEmail());
             f.setNumDocumento(detalles.getNumDocumento());
             f.setTipoDocumento(detalles.getTipoDocumento());
             f.setTarjetaSanitaria(detalles.getTarjetaSanitaria());
@@ -92,11 +91,7 @@ public class FamiliarService {
         // Nom
         fhirFam.addName().setFamily(fam.getApellido()).addGiven(fam.getNombre());
 
-        // Télécom
-        fhirFam.addTelecom().setSystem(ContactPoint.ContactPointSystem.PHONE).setValue(fam.getNumTelefono());
-        if (fam.getEmail() != null) {
-            fhirFam.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL).setValue(fam.getEmail());
-        }
+
 
         return fhirFam;
     }

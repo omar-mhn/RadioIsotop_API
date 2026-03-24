@@ -87,13 +87,13 @@ public class TratamientoService {
         // Estado y Propósito (Mapeo dinámico)
         if (t.getEstadoTratamiento() != null) {
             switch (t.getEstadoTratamiento()) {
-                case Activo:
+                case ACTIVO:
                     cp.setStatus(CarePlan.CarePlanStatus.ACTIVE);
                     break;
-                case Finalizado:
+                case FINALIZADO:
                     cp.setStatus(CarePlan.CarePlanStatus.COMPLETED);
                     break;
-                case Cancelado:
+                case CANCELADO:
                     cp.setStatus(CarePlan.CarePlanStatus.REVOKED);
                     break;
             }

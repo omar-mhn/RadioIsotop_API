@@ -1,5 +1,5 @@
 package com.projecte.radioisotopo.Model;
 
 public enum EstadoReloj {
-    Disponible, Asignado, EnMantenimiento;
+    DISPONIBLE,ASIGNADO,EN_MANTENIMIENTO;
 }

@@ -57,9 +57,7 @@ public class DoctorService {
             
             doctorExistente.setNombre(detallesActualizados.getNombre());
             doctorExistente.setApellido(detallesActualizados.getApellido());
-            doctorExistente.setEmail(detallesActualizados.getEmail());
             doctorExistente.setNumColegiado(detallesActualizados.getNumColegiado());
-            doctorExistente.setRol(detallesActualizados.getRol());
             doctorExistente.setFotoPerfil(detallesActualizados.getFotoPerfil());
             // Actualizamos el departamento asignado
             doctorExistente.setDepartamento(detallesActualizados.getDepartamento());
@@ -98,12 +96,6 @@ public class DoctorService {
             .addGiven(miDoctor.getNombre())
             .setFamily(miDoctor.getApellido());
             
-        // Email
-        if (miDoctor.getEmail() != null) {
-            fhirPractitioner.addTelecom()
-                .setSystem(ContactPoint.ContactPointSystem.EMAIL)
-                .setValue(miDoctor.getEmail());
-        }
         // foto
         if (miDoctor.getFotoPerfil() != null) {
             fhirPractitioner.addPhoto()

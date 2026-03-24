@@ -1,5 +1,14 @@
--- TABLA DEPARTAMENTO
 
+-- TABLA USUARIO
+CREATE TABLE IF NOT EXISTS Usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL, 
+    role ENUM('ADMIN', 'DOCTOR', 'PACIENTE', 'FAMILIAR') NOT NULL,
+    activo BOOLEAN DEFAULT TRUE
+);
+
+-- TABLA DEPARTAMENTO
 CREATE TABLE IF NOT EXISTS Departamento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL UNIQUE,
@@ -10,14 +19,12 @@ CREATE TABLE IF NOT EXISTS Departamento (
 );
 
 -- TABLA DOCTOR
-
 CREATE TABLE IF NOT EXISTS Doctor (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT UNIQUE NOT NULL,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
     num_colegiado VARCHAR(50),
-    rol ENUM('Doctor', 'Admin') NOT NULL,
     foto_perfil VARCHAR(255),
     id_departamento INT,
     activo BOOLEAN DEFAULT TRUE,
@@ -32,10 +39,10 @@ CREATE TABLE IF NOT EXISTS Doctor (
 
 CREATE TABLE IF NOT EXISTS Paciente (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT UNIQUE NOT NULL,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     num_telefono VARCHAR(20) NOT NULL UNIQUE,
-    email VARCHAR(100),
     num_documento VARCHAR(20) NOT NULL UNIQUE, 
     tipo_documento VARCHAR(50) NOT NULL,
     tarjeta_sanitaria VARCHAR(50) UNIQUE,
@@ -56,10 +63,10 @@ CREATE TABLE IF NOT EXISTS Paciente (
 
 CREATE TABLE IF NOT EXISTS Familiar (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT UNIQUE NOT NULL,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     num_telefono VARCHAR(20) NOT NULL UNIQUE,
-    email VARCHAR(100),
     num_documento VARCHAR(20) NOT NULL UNIQUE,
     tipo_documento VARCHAR(50) NOT NULL,
     tarjeta_sanitaria VARCHAR(50) UNIQUE,
@@ -90,7 +97,7 @@ CREATE TABLE IF NOT EXISTS Reloj (
     id INT AUTO_INCREMENT PRIMARY KEY,
     imei VARCHAR(50) UNIQUE NOT NULL,
     mac_address VARCHAR(50) UNIQUE NOT NULL,
-    estado_reloj ENUM('Disponible', 'Asignado', 'En_Mantenimiento') NOT NULL,
+    estado_reloj ENUM('DISPONIBLE', 'ASIGNADO', 'EN_MANTENIMIENTO') NOT NULL,
     bateria_actual INT NOT NULL,
     activo BOOLEAN DEFAULT TRUE
 );
@@ -107,7 +114,7 @@ CREATE TABLE IF NOT EXISTS Tratamientos (
     dosis_inicial DECIMAL(10,2) NOT NULL,
     fecha_administracion DATETIME NOT NULL,
     fecha_final_estimada DATETIME,
-    estado_tratamiento ENUM('Activo', 'Finalizado', 'Cancelado') NOT NULL,
+    estado_tratamiento ENUM('ACTIVO', 'FINALIZADO', 'CANCELADO') NOT NULL,
     activo BOOLEAN DEFAULT TRUE,
     CONSTRAINT fk_tratamiento_paciente
         FOREIGN KEY (id_paciente)
@@ -147,7 +154,7 @@ CREATE TABLE IF NOT EXISTS Telemetria (
 CREATE TABLE IF NOT EXISTS Alerta (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_tratamiento INT NOT NULL,
-    tipo ENUM('Alerta', 'Recomendacion') NOT NULL,
+    tipo ENUM('ALERTA', 'RECOMENDACION') NOT NULL,
     mensaje TEXT NOT NULL,
     fecha_hora DATETIME NOT NULL,
     CONSTRAINT fk_alerta_tratamiento

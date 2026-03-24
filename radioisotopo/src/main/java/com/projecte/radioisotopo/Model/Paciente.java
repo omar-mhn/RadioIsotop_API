@@ -36,9 +36,6 @@ public class Paciente {
     @Column(name = "num_telefono" ,length = 20, nullable = false,unique = true)
     private String numTelefono;
 
-    @Column()
-    private String email;
-
     @Column(name = "num_documento", length = 20, nullable = false, unique = true)
     private String numDocumento; 
 
@@ -83,13 +80,12 @@ public class Paciente {
 
     
 
-    public Paciente(String nombre, String apellido, String numTelefono, String email, String numDocumento,
+    public Paciente(String nombre, String apellido, String numTelefono, String numDocumento,
             String tipoDocumento, String tarjetaSanitaria, Date fechaNacimiento, String fotoPerfil, Double peso,
             Double altura, Departamento departamento, List<Familiar> familiares) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.numTelefono = numTelefono;
-        this.email = email;
         this.numDocumento = numDocumento;
         this.tipoDocumento = tipoDocumento;
         this.tarjetaSanitaria = tarjetaSanitaria;
@@ -135,14 +131,6 @@ public class Paciente {
 
     public void setNumTelefono(String numTelefono) {
         this.numTelefono = numTelefono;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
     public String getTarjetaSanitaria() {
         return tarjetaSanitaria;
