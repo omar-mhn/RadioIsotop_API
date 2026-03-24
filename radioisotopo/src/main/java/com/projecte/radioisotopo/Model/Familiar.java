@@ -33,9 +33,6 @@ public class Familiar {
     private String numTelefono;
 
 
-    @Column(length = 100)
-    private String email;
-
     @Column(name = "num_documento", length = 20, nullable = false, unique = true)
     private String numDocumento; 
 
@@ -57,13 +54,12 @@ public class Familiar {
 
     
 
-    public Familiar( String nombre, String apellido, String numTelefono, String email, String numDocumento,
+    public Familiar( String nombre, String apellido, String numTelefono, String numDocumento,
             String tipoDocumento, String tarjetaSanitaria, List<Paciente> pacientes) {
         
         this.nombre = nombre;
         this.apellido = apellido;
         this.numTelefono = numTelefono;
-        this.email = email;
         this.numDocumento = numDocumento;
         this.tipoDocumento = tipoDocumento;
         this.tarjetaSanitaria = tarjetaSanitaria;
@@ -104,14 +100,6 @@ public class Familiar {
 
     public void setNumTelefono(String numTelefono) {
         this.numTelefono = numTelefono;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     

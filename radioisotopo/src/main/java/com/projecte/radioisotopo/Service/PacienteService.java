@@ -69,7 +69,6 @@ public class PacienteService {
             pacienteExistente.setNombre(detallesActualizados.getNombre());
             pacienteExistente.setApellido(detallesActualizados.getApellido());
             pacienteExistente.setNumTelefono(detallesActualizados.getNumTelefono());
-            pacienteExistente.setEmail(detallesActualizados.getEmail());
             pacienteExistente.setNumDocumento(detallesActualizados.getNumDocumento());
             pacienteExistente.setTipoDocumento(detallesActualizados.getTipoDocumento());
             pacienteExistente.setTarjetaSanitaria(detallesActualizados.getTarjetaSanitaria());
@@ -132,12 +131,6 @@ public class PacienteService {
             .setSystem(ContactPoint.ContactPointSystem.PHONE)
             .setValue(miPaciente.getNumTelefono());
 
-        // Email (Solo si lo tiene registrado)
-        if (miPaciente.getEmail() != null) {
-            fhirPatient.addTelecom()
-                .setSystem(ContactPoint.ContactPointSystem.EMAIL)
-                .setValue(miPaciente.getEmail());
-        }
         // foto perfil
         if (miPaciente.getFotoPerfil() != null) {
             fhirPatient.addPhoto().setUrl(miPaciente.getFotoPerfil());

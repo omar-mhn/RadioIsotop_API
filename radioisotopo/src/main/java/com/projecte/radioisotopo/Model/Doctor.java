@@ -29,15 +29,8 @@ import jakarta.persistence.Column;
             @Column(length = 100, nullable = false)
             private String apellido;
 
-            @Column(length = 100, nullable = false,unique = true)
-            private String email;
-
             @Column(name="num_colegiado",length = 50)
             private String numColegiado;
-
-            @Enumerated(EnumType.STRING)
-            @Column(nullable = false)
-            private RolDoctor rol;
 
             @Column(name = "foto_perfil") 
             private String fotoPerfil;
@@ -53,13 +46,11 @@ import jakarta.persistence.Column;
 
             
 
-            public Doctor( String nombre, String apellido, String email, String numColegiado, RolDoctor rol,
+            public Doctor( String nombre, String apellido, String email, String numColegiado,
                     String fotoPerfil, Departamento departamento) {
                 this.nombre = nombre;
                 this.apellido = apellido;
-                this.email = email;
                 this.numColegiado = numColegiado;
-                this.rol = rol;
                 this.fotoPerfil = fotoPerfil;
                 this.departamento = departamento;
                 this.activo = true;
@@ -90,14 +81,6 @@ import jakarta.persistence.Column;
                 this.apellido = apellido;
             }
 
-            public String getEmail() {
-                return email;
-            }
-
-            public void setEmail(String email) {
-                this.email = email;
-            }
-
             public String getNumColegiado() {
                 return numColegiado;
             }
@@ -105,15 +88,6 @@ import jakarta.persistence.Column;
             public void setNumColegiado(String num_colegiado) {
                 this.numColegiado = num_colegiado;
             }
-
-            public RolDoctor getRol() {
-                return rol;
-            }
-
-            public void setRol(RolDoctor rol) {
-                this.rol = rol;
-            }
-
             public Departamento getDepartamento() {
                 return departamento;
             }
