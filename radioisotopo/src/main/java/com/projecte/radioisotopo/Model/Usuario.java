@@ -1,6 +1,11 @@
 package com.projecte.radioisotopo.Model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +16,9 @@ import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "Usuario")
+@Builder 
+@AllArgsConstructor 
+@NoArgsConstructor
 @SQLDelete(sql = "UPDATE Usuario SET activo = false WHERE id = ?")
 @SQLRestriction("activo = true")
 public class Usuario implements UserDetails {
@@ -34,7 +42,6 @@ public class Usuario implements UserDetails {
     // Métodos obligatorios de la interfaz UserDetails(Spring Security)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Spring Security requiere el prefijo "ROLE_" para identificar roles correctamente
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
