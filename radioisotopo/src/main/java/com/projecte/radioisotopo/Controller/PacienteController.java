@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import com.projecte.radioisotopo.Model.Paciente;
+import com.projecte.radioisotopo.DTO.PacienteDTO;
 import com.projecte.radioisotopo.Service.PacienteService;
 
 
@@ -26,8 +28,8 @@ public class PacienteController {
     PacienteService pacienteService;
     @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @PostMapping(value = "/pacientes", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> crearPaciente(@RequestBody Paciente nuevoPaciente) {
-        String fhirJson = pacienteService.createPacient(nuevoPaciente);
+    public ResponseEntity<String> crearPaciente(@Valid @RequestBody PacienteDTO dto) {
+        String fhirJson = pacienteService.createPacient(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("patient created");
     }
     @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
@@ -47,8 +49,8 @@ public class PacienteController {
     }
     @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @PutMapping(value = "/pacientes/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> actualizarPaciente(@PathVariable Long id, @RequestBody Paciente pacienteActualizado) {
-        String fhirJson = pacienteService.actualizarPaciente(id, pacienteActualizado);
+    public ResponseEntity<String> actualizarPaciente(@PathVariable Long id, @Valid @RequestBody PacienteDTO dto) {
+        String fhirJson = pacienteService.actualizarPaciente(id, dto);
         
         if (fhirJson != null) {
             return ResponseEntity.ok(fhirJson);

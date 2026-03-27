@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projecte.radioisotopo.Model.Doctor;
+import com.projecte.radioisotopo.Model.Departamento;
+import com.projecte.radioisotopo.DTO.DoctorDTO;
 import com.projecte.radioisotopo.Repository.DoctorRepository;
+import com.projecte.radioisotopo.Repository.DepartamentoRepository;
 
 
 import ca.uhn.fhir.parser.IParser;
@@ -23,10 +26,23 @@ public class DoctorService {
     DoctorRepository doctorRepository;
 
     @Autowired
+    DepartamentoRepository departamentoRepository;
+
+    @Autowired
     private IParser fhirParser;
 
     // create
-    public String crearDoctor(Doctor newDoctor){
+    public String crearDoctor(DoctorDTO dto){
+        Doctor newDoctor = new Doctor();
+        newDoctor.setNombre(dto.nombre());
+        newDoctor.setApellido(dto.apellido());
+        newDoctor.setNumColegiado(dto.numColegiado());
+        newDoctor.setFotoPerfil(dto.fotoPerfil());
+        newDoctor.setActivo(true);
+        if (dto.departamentoId() != null) {
+            Departamento d = departamentoRepository.findById(dto.departamentoId()).orElse(null);
+            newDoctor.setDepartamento(d);
+        }
         Doctor doctorGuardado = doctorRepository.save(newDoctor);
         return fhirParser.encodeResourceToString(convertirAFhir(doctorGuardado));
     }
@@ -49,18 +65,23 @@ public class DoctorService {
         return null;
     }
     // update
-    public String actualizarDoctor(Long id, Doctor detallesActualizados) {
+    public String actualizarDoctor(Long id, DoctorDTO dto) {
         Optional<Doctor> doctorOpt = doctorRepository.findById(id);
         
         if (doctorOpt.isPresent()) {
             Doctor doctorExistente = doctorOpt.get();
             
-            doctorExistente.setNombre(detallesActualizados.getNombre());
-            doctorExistente.setApellido(detallesActualizados.getApellido());
-            doctorExistente.setNumColegiado(detallesActualizados.getNumColegiado());
-            doctorExistente.setFotoPerfil(detallesActualizados.getFotoPerfil());
+            doctorExistente.setNombre(dto.nombre());
+            doctorExistente.setApellido(dto.apellido());
+            doctorExistente.setNumColegiado(dto.numColegiado());
+            doctorExistente.setFotoPerfil(dto.fotoPerfil());
             // Actualizamos el departamento asignado
-            doctorExistente.setDepartamento(detallesActualizados.getDepartamento());
+            if (dto.departamentoId() != null) {
+                Departamento d = departamentoRepository.findById(dto.departamentoId()).orElse(null);
+                doctorExistente.setDepartamento(d);
+            } else {
+                doctorExistente.setDepartamento(null);
+            }
            
             
             Doctor doctorActualizado = doctorRepository.save(doctorExistente);

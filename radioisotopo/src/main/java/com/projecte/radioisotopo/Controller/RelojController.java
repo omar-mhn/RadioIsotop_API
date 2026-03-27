@@ -1,6 +1,8 @@
 package com.projecte.radioisotopo.Controller;
 
 import com.projecte.radioisotopo.Model.Reloj;
+import com.projecte.radioisotopo.DTO.RelojDTO;
+import jakarta.validation.Valid;
 import com.projecte.radioisotopo.Service.RelojService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,8 +20,8 @@ public class RelojController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/relojes",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> crearReloj(@RequestBody Reloj nuevoReloj) {
-        String fhirJson = relojService.crearReloj(nuevoReloj);
+    public ResponseEntity<String> crearReloj(@Valid @RequestBody RelojDTO dto) {
+        String fhirJson = relojService.crearReloj(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(fhirJson);
     }
 
@@ -41,8 +43,8 @@ public class RelojController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @PutMapping(value = "/relojes/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> actualizar(@PathVariable Long id, @RequestBody Reloj detalles) {
-        String fhirJson = relojService.actualizarReloj(id, detalles);
+    public ResponseEntity<String> actualizar(@PathVariable Long id, @Valid @RequestBody RelojDTO dto) {
+        String fhirJson = relojService.actualizarReloj(id, dto);
         if (fhirJson != null) {
             return ResponseEntity.ok(fhirJson);
         }

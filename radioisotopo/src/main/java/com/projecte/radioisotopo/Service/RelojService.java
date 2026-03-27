@@ -7,6 +7,7 @@ import org.hl7.fhir.r4.model.Device;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.projecte.radioisotopo.Model.Reloj;
+import com.projecte.radioisotopo.DTO.RelojDTO;
 import com.projecte.radioisotopo.Repository.RelojRepository;
 
 import ca.uhn.fhir.parser.IParser;
@@ -21,7 +22,13 @@ public class RelojService {
     private IParser fhirParser;
 
     // Create
-    public String crearReloj(Reloj newReloj) {
+    public String crearReloj(RelojDTO dto) {
+        Reloj newReloj = new Reloj();
+        newReloj.setImei(dto.imei());
+        newReloj.setMacAddress(dto.macAddress());
+        newReloj.setEstadoReloj(dto.estadoReloj());
+        newReloj.setBateriaActual(dto.bateriaActual());
+        newReloj.setActivo(true);
         Reloj guardado = relojRepository.save(newReloj);
         return fhirParser.encodeResourceToString(convertirAFhir(guardado));
     }
@@ -43,14 +50,14 @@ public class RelojService {
     }
 
     // UPDATE 
-    public String actualizarReloj(Long id, Reloj detalles) {
+    public String actualizarReloj(Long id, RelojDTO dto) {
         Optional<Reloj> relojOpt = relojRepository.findById(id);
         if (relojOpt.isPresent()) {
             Reloj r = relojOpt.get();
-            r.setImei(detalles.getImei());
-            r.setMacAddress(detalles.getMacAddress());
-            r.setEstadoReloj(detalles.getEstadoReloj());
-            r.setBateriaActual(detalles.getBateriaActual());
+            r.setImei(dto.imei());
+            r.setMacAddress(dto.macAddress());
+            r.setEstadoReloj(dto.estadoReloj());
+            r.setBateriaActual(dto.bateriaActual());
             
             Reloj guardado = relojRepository.save(r);
             return fhirParser.encodeResourceToString(convertirAFhir(guardado));

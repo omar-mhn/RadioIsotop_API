@@ -1,6 +1,8 @@
 package com.projecte.radioisotopo.Controller;
 
 import com.projecte.radioisotopo.Model.Familiar;
+import com.projecte.radioisotopo.DTO.FamiliarDTO;
+import jakarta.validation.Valid;
 import com.projecte.radioisotopo.Service.FamiliarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,8 +20,8 @@ public class FamiliarController {
 
     @PreAuthorize("hasRole('ADMIN','DOCTOR')")
     @PostMapping(value = "/familiares", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> crearFamiliar(@RequestBody Familiar nuevoFamiliar) {
-        String fhirJson = familiarService.crearFamiliar(nuevoFamiliar);
+    public ResponseEntity<String> crearFamiliar(@Valid @RequestBody FamiliarDTO dto) {
+        String fhirJson = familiarService.crearFamiliar(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Familiar creado !");
     }
 
@@ -41,8 +43,8 @@ public class FamiliarController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR') or #id == authentication.principal.id")
     @PutMapping(value = "/familiares/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> actualizar(@PathVariable Long id, @RequestBody Familiar detalles) {
-        String fhirJson = familiarService.actualizarFamiliar(id, detalles);
+    public ResponseEntity<String> actualizar(@PathVariable Long id, @Valid @RequestBody FamiliarDTO dto) {
+        String fhirJson = familiarService.actualizarFamiliar(id, dto);
         if (fhirJson != null) {
             return ResponseEntity.ok(fhirJson);
         }

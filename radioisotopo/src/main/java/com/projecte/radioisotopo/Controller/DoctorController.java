@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import com.projecte.radioisotopo.Model.Doctor;
+import com.projecte.radioisotopo.DTO.DoctorDTO;
 import com.projecte.radioisotopo.Service.DoctorService;
 
 @RestController
@@ -24,8 +26,8 @@ public class DoctorController {
     private DoctorService doctorService;
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/doctores", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> crearDoctor(@RequestBody Doctor nuevoDoctor) {
-        String fhirJson = doctorService.crearDoctor(nuevoDoctor);
+    public ResponseEntity<String> crearDoctor(@Valid @RequestBody DoctorDTO dto) {
+        String fhirJson = doctorService.crearDoctor(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Doctor Creado !");
     }
 
@@ -47,8 +49,8 @@ public class DoctorController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/doctores/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> actualizarDoctor(@PathVariable Long id, @RequestBody Doctor doctorActualizado) {
-        String fhirJson = doctorService.actualizarDoctor(id, doctorActualizado);
+    public ResponseEntity<String> actualizarDoctor(@PathVariable Long id, @Valid @RequestBody DoctorDTO dto) {
+        String fhirJson = doctorService.actualizarDoctor(id, dto);
         if (fhirJson != null) {
             return ResponseEntity.ok(fhirJson);
         }

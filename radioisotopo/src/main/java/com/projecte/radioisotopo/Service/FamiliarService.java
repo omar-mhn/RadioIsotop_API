@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projecte.radioisotopo.Model.Familiar;
+import com.projecte.radioisotopo.DTO.FamiliarDTO;
 import com.projecte.radioisotopo.Repository.FamiliarRepository;
 
 
@@ -24,7 +25,15 @@ public class FamiliarService {
     private IParser fhirParser;
 
     //create
-    public String crearFamiliar(Familiar f) {
+    public String crearFamiliar(FamiliarDTO dto) {
+        Familiar f = new Familiar();
+        f.setNombre(dto.nombre());
+        f.setApellido(dto.apellido());
+        f.setNumTelefono(dto.numTelefono());
+        f.setNumDocumento(dto.numDocumento());
+        f.setTipoDocumento(dto.tipoDocumento());
+        f.setTarjetaSanitaria(dto.tarjetaSanitaria());
+        f.setActivo(true);
         return fhirParser.encodeResourceToString(convertirAFhir(familiarRepository.save(f)));
     }
     // read All
@@ -42,17 +51,16 @@ public class FamiliarService {
         }
         return null;
     }
-    // update
-    public String actualizarFamiliar(Long id, Familiar detalles) {
+    public String actualizarFamiliar(Long id, FamiliarDTO dto) {
         Optional<Familiar> famOpt = familiarRepository.findById(id);
         if (famOpt.isPresent()) {
             Familiar f = famOpt.get();
-            f.setNombre(detalles.getNombre());
-            f.setApellido(detalles.getApellido());
-            f.setNumTelefono(detalles.getNumTelefono());
-            f.setNumDocumento(detalles.getNumDocumento());
-            f.setTipoDocumento(detalles.getTipoDocumento());
-            f.setTarjetaSanitaria(detalles.getTarjetaSanitaria());
+            f.setNombre(dto.nombre());
+            f.setApellido(dto.apellido());
+            f.setNumTelefono(dto.numTelefono());
+            f.setNumDocumento(dto.numDocumento());
+            f.setTipoDocumento(dto.tipoDocumento());
+            f.setTarjetaSanitaria(dto.tarjetaSanitaria());
             
             return fhirParser.encodeResourceToString(convertirAFhir(familiarRepository.save(f)));
         }

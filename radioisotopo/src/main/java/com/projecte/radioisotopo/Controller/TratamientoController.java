@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+
+import com.projecte.radioisotopo.Model.Tratamiento;
+import com.projecte.radioisotopo.DTO.TratamientoDTO;
 
 @RestController
 @RequestMapping("/api")
@@ -26,8 +30,8 @@ public class TratamientoController {
     
     @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @PostMapping(value = "/tratamientos", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> crear(@RequestBody Tratamiento t) {
-        String fhirJson = tratamientoService.crearTratamiento(t);
+    public ResponseEntity<String> crear(@Valid @RequestBody TratamientoDTO dto) {
+        String fhirJson = tratamientoService.crearTratamiento(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(fhirJson);
     }
 
@@ -49,8 +53,8 @@ public class TratamientoController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @PutMapping(value = "/tratamientos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> actualizar(@PathVariable Long id, @RequestBody Tratamiento t) {
-        String fhirJson = tratamientoService.actualizarTratamiento(id, t);
+    public ResponseEntity<String> actualizar(@PathVariable Long id, @Valid @RequestBody TratamientoDTO dto) {
+        String fhirJson = tratamientoService.actualizarTratamiento(id, dto);
         if (fhirJson != null) {
             return ResponseEntity.ok(fhirJson);
         }
