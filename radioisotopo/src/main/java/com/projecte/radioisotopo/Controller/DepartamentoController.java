@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,19 +16,19 @@ public class DepartamentoController {
     @Autowired
     private DepartamentoService departamentoService;
 
-    
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/departamentos",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> crearDepartamento(@RequestBody Departamento dep) {
         String fhirJson = departamentoService.crearDepartamento(dep);
         return ResponseEntity.status(HttpStatus.CREATED).body("Departamento creado!");
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'PACIENTE', 'FAMILIAR')")
     @GetMapping(value = "/departamentos",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> obtenerTodos() {
         return ResponseEntity.ok(departamentoService.obtenerTodos());
     }
 
-  
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'PACIENTE', 'FAMILIAR')")
     @GetMapping(value = "/departamentos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> obtenerPorId(@PathVariable Long id) {
         String fhirJson = departamentoService.obtenerPorId(id);
@@ -36,7 +37,7 @@ public class DepartamentoController {
         }
         return ResponseEntity.notFound().build();
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/departamentos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> actualizar(@PathVariable Long id, @RequestBody Departamento dep) {
         String fhirJson = departamentoService.actualizarDepartamento(id, dep);
@@ -45,7 +46,7 @@ public class DepartamentoController {
         }
         return ResponseEntity.notFound().build();
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/departamentos/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         if (departamentoService.eliminar(id)) {

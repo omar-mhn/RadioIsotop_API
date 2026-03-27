@@ -6,7 +6,8 @@
     import org.springframework.http.HttpStatus;
     import org.springframework.http.MediaType;
     import org.springframework.http.ResponseEntity;
-    import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
     @RestController
     @RequestMapping("/api")
@@ -16,14 +17,17 @@
         private TelemetriaService telemetriaService;
 
         // Recibir datos del Reloj
+        @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
         @PostMapping(value = "/telemetria", produces = MediaType.APPLICATION_JSON_VALUE)
         public ResponseEntity<String> guardar(@RequestBody Telemetria t) {
             return ResponseEntity.status(HttpStatus.CREATED).body(telemetriaService.registrarDato(t));
         }
 
         // Ver todo el historial 
+        @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
         @GetMapping(value = "/telemetria", produces = MediaType.APPLICATION_JSON_VALUE)
         public ResponseEntity<String> obtenerHistorial() {
             return ResponseEntity.ok(telemetriaService.obtenerTodas());
         }
+        
     }

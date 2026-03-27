@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
@@ -13,8 +14,9 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // Llave secreta para firmar los tokens (mínimo 32 caracteres)
-    private static final String SECRET_KEY = "mi_clave_secreta_super_segura_2026_radioisotopo_proyecto";
+    // Llave secreta inyectada desde application.properties (mínimo 32 caracteres)
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     // Extrae el email del usuario que está dentro del token
     public String extraerUsername(String token) {
@@ -43,11 +45,18 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = SECRET_KEY.getBytes();
+        byte[] keyBytes = secretKey.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
     }
     public String generarToken(UserDetails userDetails) {
-        return generarToken(new java.util.HashMap<>(), userDetails);
+        java.util.Map<String, Object> extraClaims = new java.util.HashMap<>();
+        
+        // Extraer el rol del usuario (Ej: ROLE_ADMIN) y añadirlo a los claims
+        if (userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
+            extraClaims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+        }
+
+        return generarToken(extraClaims, userDetails);
     }
 
     // Generar el token con claims (datos extras) y el usuario
