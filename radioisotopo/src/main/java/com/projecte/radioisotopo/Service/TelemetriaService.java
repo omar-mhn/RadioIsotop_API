@@ -6,7 +6,10 @@ import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.projecte.radioisotopo.Model.Telemetria;
+import com.projecte.radioisotopo.Model.Tratamiento;
+import com.projecte.radioisotopo.DTO.TelemetriaDTO;
 import com.projecte.radioisotopo.Repository.TelemetriaRepository;
+import com.projecte.radioisotopo.Repository.TratamientoRepository;
 
 import ca.uhn.fhir.parser.IParser;
 
@@ -17,10 +20,24 @@ public class TelemetriaService {
     private TelemetriaRepository telemetriaRepository;
 
     @Autowired
+    private TratamientoRepository tratamientoRepository;
+
+    @Autowired
     private IParser fhirParser;
 
     // Registrar una nueva lectura de la pulsera
-    public String registrarDato(Telemetria t) {
+    public String registrarDato(TelemetriaDTO dto) {
+        Telemetria t = new Telemetria();
+        t.setFrecuenciaCardiaca(dto.frecuenciaCardiaca());
+        t.setRadiacionActual(dto.radiacionActual());
+        t.setTemperatura(dto.temperatura());
+        t.setPasosAcumulados(dto.pasosAcumulados());
+        t.setFechaHora(dto.fechaHora());
+        
+        if (dto.tratamientoId() != null) {
+            t.setTratamiento(tratamientoRepository.findById(dto.tratamientoId()).orElse(null));
+        }
+        
         Telemetria guardado = telemetriaRepository.save(t);
         return fhirParser.encodeResourceToString(convertirAFhir(guardado));
     }

@@ -2,6 +2,7 @@ package com.projecte.radioisotopo.Service;
 
 
 import com.projecte.radioisotopo.Model.Departamento;
+import com.projecte.radioisotopo.DTO.DepartamentoDTO;
 import com.projecte.radioisotopo.Repository.DepartamentoRepository;
 
 import org.hl7.fhir.r4.model.Bundle;
@@ -24,7 +25,13 @@ public class DepartamentoService {
     private IParser fhirParser;
 
     // Create
-    public String crearDepartamento(Departamento dep) {
+    public String crearDepartamento(DepartamentoDTO dto) {
+        Departamento dep = new Departamento();
+        dep.setNombre(dto.nombre());
+        dep.setCentro(dto.centro());
+        dep.setUbicacion(dto.ubicacion());
+        dep.setEmail(dto.email());
+        dep.setActivo(true);
         return fhirParser.encodeResourceToString(convertirAFhir(departamentoRepository.save(dep)));
     }
     // read all
@@ -44,17 +51,17 @@ public class DepartamentoService {
         return null;
     }
     // uppdte
-    public String actualizarDepartamento(Long id, Departamento detallesActualizados) {
+    public String actualizarDepartamento(Long id, DepartamentoDTO dto) {
         Optional<Departamento> depOpt = departamentoRepository.findById(id);
 
         if (depOpt.isPresent()) {
             Departamento depExistente = depOpt.get();
 
             
-            depExistente.setNombre(detallesActualizados.getNombre());
-            depExistente.setCentro(detallesActualizados.getCentro());
-            depExistente.setUbicacion(detallesActualizados.getUbicacion());
-            depExistente.setEmail(detallesActualizados.getEmail());
+            depExistente.setNombre(dto.nombre());
+            depExistente.setCentro(dto.centro());
+            depExistente.setUbicacion(dto.ubicacion());
+            depExistente.setEmail(dto.email());
             
 
             

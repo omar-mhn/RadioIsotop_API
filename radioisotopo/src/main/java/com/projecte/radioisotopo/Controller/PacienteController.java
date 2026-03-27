@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,8 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import com.projecte.radioisotopo.Model.Paciente;
+import com.projecte.radioisotopo.DTO.PacienteDTO;
 import com.projecte.radioisotopo.Service.PacienteService;
 
 
@@ -23,18 +26,18 @@ public class PacienteController {
 
     @Autowired
     PacienteService pacienteService;
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @PostMapping(value = "/pacientes", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> crearPaciente(@RequestBody Paciente nuevoPaciente) {
-        String fhirJson = pacienteService.createPacient(nuevoPaciente);
+    public ResponseEntity<String> crearPaciente(@Valid @RequestBody PacienteDTO dto) {
+        String fhirJson = pacienteService.createPacient(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("patient created");
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @GetMapping(value = "/pacientes", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAllPacientes() {
         return ResponseEntity.ok(pacienteService.leerTodosPacientes());
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR') or #id == authentication.principal.id")
     @GetMapping(value = "/pacientes/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getPacienteById(@PathVariable Long id) {
         String fhirJson = pacienteService.leerPacientePorId(id);
@@ -44,10 +47,10 @@ public class PacienteController {
         }
         return ResponseEntity.notFound().build(); 
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @PutMapping(value = "/pacientes/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> actualizarPaciente(@PathVariable Long id, @RequestBody Paciente pacienteActualizado) {
-        String fhirJson = pacienteService.actualizarPaciente(id, pacienteActualizado);
+    public ResponseEntity<String> actualizarPaciente(@PathVariable Long id, @Valid @RequestBody PacienteDTO dto) {
+        String fhirJson = pacienteService.actualizarPaciente(id, dto);
         
         if (fhirJson != null) {
             return ResponseEntity.ok(fhirJson);
@@ -55,7 +58,7 @@ public class PacienteController {
         return ResponseEntity.notFound().build();
     }
 
-    
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/pacientes/{id}")
     public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) {
         boolean eliminado = pacienteService.eliminarPaciente(id);
