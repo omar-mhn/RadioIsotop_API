@@ -79,6 +79,33 @@ public class DepartamentoService {
         return false;
     }
 
+    // Obtener todos incluyendo eliminados (para ADMIN)
+    public String obtenerTodosIncluyendoEliminados() {
+        List<Departamento> lista = departamentoRepository.findAllIncludingInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Departamento d : lista) bundle.addEntry().setResource(convertirAFhir(d));
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener solo eliminados (para ADMIN)
+    public String obtenerEliminados() {
+        List<Departamento> lista = departamentoRepository.findAllInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Departamento d : lista) bundle.addEntry().setResource(convertirAFhir(d));
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener por ID incluyendo eliminados (para ADMIN)
+    public String obtenerPorIdIncluyendoEliminado(Long id) {
+        Optional<Departamento> depOpt = departamentoRepository.findByIdIncludingInactive(id);
+        if (depOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(depOpt.get()));
+        }
+        return null;
+    }
+
     // TRADUCTOR FHIR: Departamento (Java) -> Organization (FHIR)
     private Organization convertirAFhir(Departamento dep) {
         Organization fhirOrg = new Organization();

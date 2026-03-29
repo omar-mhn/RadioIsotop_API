@@ -69,4 +69,50 @@ public class TratamientoController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    // Obtener tratamientos por paciente
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    @GetMapping(value = "/tratamientos/paciente/{pacienteId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerPorPaciente(@PathVariable Long pacienteId) {
+        return ResponseEntity.ok(tratamientoService.obtenerPorPaciente(pacienteId));
+    }
+
+    // Obtener tratamientos por doctor
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    @GetMapping(value = "/tratamientos/doctor/{doctorId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerPorDoctor(@PathVariable Long doctorId) {
+        return ResponseEntity.ok(tratamientoService.obtenerPorDoctor(doctorId));
+    }
+
+    // Obtener tratamientos activos
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    @GetMapping(value = "/tratamientos/activos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerActivos() {
+        return ResponseEntity.ok(tratamientoService.obtenerActivos());
+    }
+
+    // ADMIN: Obtener todos incluyendo eliminados
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/tratamientos/todos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerTodosIncluyendoEliminados() {
+        return ResponseEntity.ok(tratamientoService.obtenerTodosIncluyendoEliminados());
+    }
+
+    // ADMIN: Obtener solo eliminados
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/tratamientos/eliminados", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerEliminados() {
+        return ResponseEntity.ok(tratamientoService.obtenerEliminados());
+    }
+
+    // ADMIN: Obtener por ID incluyendo eliminado
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/tratamientos/todos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerPorIdIncluyendoEliminado(@PathVariable Long id) {
+        String fhirJson = tratamientoService.obtenerPorIdIncluyendoEliminado(id);
+        if (fhirJson != null) {
+            return ResponseEntity.ok(fhirJson);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

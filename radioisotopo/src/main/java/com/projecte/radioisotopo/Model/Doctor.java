@@ -35,6 +35,9 @@ import jakarta.persistence.Column;
             @Column(name = "foto_perfil") 
             private String fotoPerfil;
 
+            @Column(name = "id_usuario", unique = true, nullable = false)
+            private Long idUsuario;
+
             @Column(nullable = false)
             private boolean activo = true;
 
@@ -108,6 +111,14 @@ import jakarta.persistence.Column;
             }
             public void setFotoPerfil(String fotoPerfil) {
                 this.fotoPerfil = fotoPerfil;
+            }
+
+            public Long getIdUsuario() {
+                return idUsuario;
+            }
+
+            public void setIdUsuario(Long idUsuario) {
+                this.idUsuario = idUsuario;
             }
             
             

@@ -51,6 +51,9 @@ public class Paciente {
     @Column(name = "foto_perfil") 
     private String fotoPerfil;
 
+    @Column(name = "id_usuario", unique = true, nullable = false)
+    private Long idUsuario;
+
     @Column(nullable = false)
     private boolean activo = true;
 
@@ -210,6 +213,14 @@ public class Paciente {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
     }
     
     

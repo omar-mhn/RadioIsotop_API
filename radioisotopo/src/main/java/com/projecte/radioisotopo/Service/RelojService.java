@@ -73,6 +73,48 @@ public class RelojService {
         return false;
     }
 
+    // Obtener relojes disponibles
+    public String obtenerDisponibles() {
+        List<Reloj> lista = relojRepository.findByEstadoReloj(
+            com.projecte.radioisotopo.Model.EstadoReloj.DISPONIBLE);
+        return crearBundle(lista);
+    }
+
+    // Obtener relojes con batería baja
+    public String obtenerBateriaBaja(Integer nivelMinimo) {
+        List<Reloj> lista = relojRepository.findByBateriaActualLessThan(nivelMinimo);
+        return crearBundle(lista);
+    }
+
+    // Obtener todos incluyendo eliminados (para ADMIN)
+    public String obtenerTodosIncluyendoEliminados() {
+        List<Reloj> lista = relojRepository.findAllIncludingInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener solo eliminados (para ADMIN)
+    public String obtenerEliminados() {
+        List<Reloj> lista = relojRepository.findAllInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener por ID incluyendo eliminados (para ADMIN)
+    public String obtenerPorIdIncluyendoEliminado(Long id) {
+        Optional<Reloj> relojOpt = relojRepository.findByIdIncludingInactive(id);
+        if (relojOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(relojOpt.get()));
+        }
+        return null;
+    }
+
+    // Helper para crear Bundle
+    private String crearBundle(List<Reloj> lista) {
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Reloj r : lista) bundle.addEntry().setResource(convertirAFhir(r));
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
     // TRADUCTOR FHIR: Reloj (Java) -> Device (FHIR)
     private Device convertirAFhir(Reloj miReloj) {
         Device fhirDevice = new Device();

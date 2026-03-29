@@ -51,4 +51,19 @@ public class UsuarioService implements UserDetailsService {
         }
         return false;
     }
+
+    // Obtener todos los usuarios incluyendo los eliminados (para ADMIN)
+    public List<Usuario> obtenerTodosIncluyendoInactivos() {
+        return usuarioRepository.findAllIncludingInactive();
+    }
+
+    // Obtener solo los usuarios eliminados (para ADMIN)
+    public List<Usuario> obtenerEliminados() {
+        return usuarioRepository.findAllInactive();
+    }
+
+    // Obtener usuario por ID incluyendo inactivos (para ADMIN)
+    public Usuario obtenerPorIdIncluyendoInactivo(Long id) {
+        return usuarioRepository.findByIdIncludingInactive(id).orElse(null);
+    }
 }

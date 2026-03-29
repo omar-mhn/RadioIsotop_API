@@ -53,6 +53,54 @@ public class TelemetriaService {
         return fhirParser.encodeResourceToString(bundle);
     }
 
+    // Obtener telemetría de un paciente específico
+    public String obtenerPorPaciente(Long pacienteId) {
+        List<Telemetria> lista = telemetriaRepository.findByTratamientoPacienteId(pacienteId);
+        return crearBundle(lista);
+    }
+
+    // Obtener por ID
+    public String obtenerPorId(Long id) {
+        return telemetriaRepository.findById(id)
+            .map(t -> fhirParser.encodeResourceToString(convertirAFhir(t)))
+            .orElse(null);
+    }
+
+    // Obtener por tratamiento
+    public String obtenerPorTratamiento(Long tratamientoId) {
+        List<Telemetria> lista = telemetriaRepository.findByTratamientoId(tratamientoId);
+        return crearBundle(lista);
+    }
+
+    // Obtener todos incluyendo eliminados (ADMIN)
+    public String obtenerTodosIncluyendoEliminados() {
+        List<Telemetria> lista = telemetriaRepository.findAllIncludingInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener solo eliminados (ADMIN)
+    public String obtenerEliminados() {
+        List<Telemetria> lista = telemetriaRepository.findAllInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener por ID incluyendo eliminado (ADMIN)
+    public String obtenerPorIdIncluyendoEliminado(Long id) {
+        return telemetriaRepository.findByIdIncludingInactive(id)
+            .map(t -> fhirParser.encodeResourceToString(convertirAFhir(t)))
+            .orElse(null);
+    }
+
+    // Helper para crear Bundle
+    private String crearBundle(List<Telemetria> lista) {
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Telemetria t : lista) {
+            bundle.addEntry().setResource(convertirAFhir(t));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
     // TRADUCTOR FHIR: Telemetria -> Observation (Vital Signs)
    
     private Observation convertirAFhir(Telemetria t) {

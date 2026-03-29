@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS Tratamientos (
         ON DELETE CASCADE,
         CONSTRAINT fk_tratamiento_doctor
         FOREIGN KEY (id_doctor)
-        REFERENCES Doctor(id)   -- Relación con la tabla Doctor
+        REFERENCES Doctor(id)   
         ON DELETE CASCADE,
     CONSTRAINT fk_tratamiento_reloj
         FOREIGN KEY (id_reloj)
@@ -157,6 +157,7 @@ CREATE TABLE IF NOT EXISTS Alerta (
     tipo ENUM('ALERTA', 'RECOMENDACION') NOT NULL,
     mensaje TEXT NOT NULL,
     fecha_hora DATETIME NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
     CONSTRAINT fk_alerta_tratamiento
         FOREIGN KEY (id_tratamiento)
         REFERENCES Tratamientos(id)

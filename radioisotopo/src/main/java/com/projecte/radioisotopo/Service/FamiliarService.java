@@ -75,6 +75,31 @@ public class FamiliarService {
         }
         return false;
     }
+
+    // Obtener todos los familiares incluyendo eliminados (para ADMIN)
+    public String obtenerTodosIncluyendoEliminados() {
+        List<Familiar> lista = familiarRepository.findAllIncludingInactive();
+        Bundle bundle = new Bundle().setType(Bundle.BundleType.SEARCHSET);
+        for (Familiar f : lista) bundle.addEntry().setResource(convertirAFhir(f));
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener solo los familiares eliminados (para ADMIN)
+    public String obtenerEliminados() {
+        List<Familiar> lista = familiarRepository.findAllInactive();
+        Bundle bundle = new Bundle().setType(Bundle.BundleType.SEARCHSET);
+        for (Familiar f : lista) bundle.addEntry().setResource(convertirAFhir(f));
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener familiar por ID incluyendo eliminados (para ADMIN)
+    public String obtenerPorIdIncluyendoEliminado(Long id) {
+        Optional<Familiar> famOpt = familiarRepository.findByIdIncludingInactive(id);
+        if (famOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(famOpt.get()));
+        }
+        return null;
+    }
     // Traductor FHIR
     private RelatedPerson convertirAFhir(Familiar fam) {
         RelatedPerson fhirFam = new RelatedPerson();

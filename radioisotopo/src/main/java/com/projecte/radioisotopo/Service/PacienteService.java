@@ -141,6 +141,69 @@ public class PacienteService {
         return false; 
     }
 
+    // Obtener paciente por ID de usuario (para acceso del propio paciente)
+    public String leerPacientePorIdUsuario(Long idUsuario) {
+        Optional<Paciente> paciente = pacienteRepository.findByIdUsuario(idUsuario);
+        if (paciente.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(paciente.get()));
+        }
+        return null;
+    }
+
+    // Obtener ID del paciente por ID de usuario
+    public Long obtenerIdPacientePorIdUsuario(Long idUsuario) {
+        Optional<Paciente> paciente = pacienteRepository.findByIdUsuario(idUsuario);
+        return paciente.map(Paciente::getId).orElse(null);
+    }
+
+    // Obtener pacientes asociados a un familiar (por ID de usuario del familiar)
+    public String leerPacientesPorFamiliar(Long idUsuarioFamiliar) {
+        List<Paciente> pacientes = familiarRepository.findPacientesByIdUsuario(idUsuarioFamiliar);
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Paciente p : pacientes) {
+            bundle.addEntry().setResource(convertirAFhir(p));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Verificar si un familiar tiene acceso a un paciente específico
+    public boolean familiarTieneAccesoAPaciente(Long idUsuarioFamiliar, Long pacienteId) {
+        List<Paciente> pacientes = familiarRepository.findPacientesByIdUsuario(idUsuarioFamiliar);
+        return pacientes.stream().anyMatch(p -> p.getId().equals(pacienteId));
+    }
+
+    // Obtener todos los pacientes incluyendo eliminados (para ADMIN)
+    public String leerTodosPacientesIncluyendoEliminados() {
+        List<Paciente> pacientes = pacienteRepository.findAllIncludingInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Paciente p : pacientes) {
+            bundle.addEntry().setResource(convertirAFhir(p));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener solo los pacientes eliminados (para ADMIN)
+    public String leerPacientesEliminados() {
+        List<Paciente> pacientes = pacienteRepository.findAllInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Paciente p : pacientes) {
+            bundle.addEntry().setResource(convertirAFhir(p));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener paciente por ID incluyendo eliminados (para ADMIN)
+    public String leerPacientePorIdIncluyendoEliminado(Long id) {
+        Optional<Paciente> paciente = pacienteRepository.findByIdIncludingInactive(id);
+        if (paciente.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(paciente.get()));
+        }
+        return null;
+    }
+
     // TRADUCTOR FHIR: Mapea Paciente (Java) -> Patient (FHIR)
     private Patient convertirAFhir(Paciente miPaciente) {
         Patient fhirPatient = new Patient();

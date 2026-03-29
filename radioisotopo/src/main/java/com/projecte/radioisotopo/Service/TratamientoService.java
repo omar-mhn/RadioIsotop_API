@@ -127,6 +127,57 @@ public class TratamientoService {
         }
         return false;
     }
+
+    // Obtener por paciente
+    public String obtenerPorPaciente(Long pacienteId) {
+        List<Tratamiento> lista = tratamientoRepository.findByPacienteId(pacienteId);
+        return crearBundle(lista);
+    }
+
+    // Obtener por doctor
+    public String obtenerPorDoctor(Long doctorId) {
+        List<Tratamiento> lista = tratamientoRepository.findByDoctorId(doctorId);
+        return crearBundle(lista);
+    }
+
+    // Obtener tratamientos activos
+    public String obtenerActivos() {
+        List<Tratamiento> lista = tratamientoRepository.findByEstadoTratamiento(
+            com.projecte.radioisotopo.Model.EstadoTratamiento.ACTIVO);
+        return crearBundle(lista);
+    }
+
+    // Obtener todos incluyendo eliminados (para ADMIN)
+    public String obtenerTodosIncluyendoEliminados() {
+        List<Tratamiento> lista = tratamientoRepository.findAllIncludingInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener solo eliminados (para ADMIN)
+    public String obtenerEliminados() {
+        List<Tratamiento> lista = tratamientoRepository.findAllInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener por ID incluyendo eliminados (para ADMIN)
+    public String obtenerPorIdIncluyendoEliminado(Long id) {
+        Optional<Tratamiento> tOpt = tratamientoRepository.findByIdIncludingInactive(id);
+        if (tOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(tOpt.get()));
+        }
+        return null;
+    }
+
+    // Helper para crear Bundle
+    private String crearBundle(List<Tratamiento> lista) {
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Tratamiento t : lista) {
+            bundle.addEntry().setResource(convertirAFhir(t));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
     // TRADUCTOR FHIR: Tratamiento (Java) -> CarePlan (FHIR)
     private CarePlan convertirAFhir(Tratamiento t) {
         CarePlan cp = new CarePlan();
