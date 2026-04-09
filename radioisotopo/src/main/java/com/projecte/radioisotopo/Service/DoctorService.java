@@ -99,6 +99,52 @@ public class DoctorService {
         return false;
     }
 
+    // Obtenir les données du docteur par son ID utilisateur
+    public String obtenerDoctorPorIdUsuario(Long idUsuario) {
+        Optional<Doctor> doctorOpt = doctorRepository.findByIdUsuario(idUsuario);
+        if (doctorOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(doctorOpt.get()));
+        }
+        return null;
+    }
+
+    // Obtenir l'ID du docteur par son ID utilisateur
+    public Long obtenerIdDoctorPorIdUsuario(Long idUsuario) {
+        Optional<Doctor> doctorOpt = doctorRepository.findByIdUsuario(idUsuario);
+        return doctorOpt.map(Doctor::getId).orElse(null);
+    }
+
+    // Obtener todos los doctores incluyendo eliminados (para ADMIN)
+    public String obtenerTodosLosDoctoresIncluyendoEliminados() {
+        List<Doctor> doctores = doctorRepository.findAllIncludingInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Doctor d : doctores) {
+            bundle.addEntry().setResource(convertirAFhir(d));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener solo los doctores eliminados (para ADMIN)
+    public String obtenerDoctoresEliminados() {
+        List<Doctor> doctores = doctorRepository.findAllInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Doctor d : doctores) {
+            bundle.addEntry().setResource(convertirAFhir(d));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener doctor por ID incluyendo eliminados (para ADMIN)
+    public String obtenerDoctorPorIdIncluyendoEliminado(Long id) {
+        Optional<Doctor> doctorOpt = doctorRepository.findByIdIncludingInactive(id);
+        if (doctorOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(doctorOpt.get()));
+        }
+        return null;
+    }
+
     // TRADUCTOR FHIR: Doctor (Java) -> Practitioner (FHIR)
     private Practitioner convertirAFhir(Doctor miDoctor) {
         Practitioner fhirPractitioner = new Practitioner();

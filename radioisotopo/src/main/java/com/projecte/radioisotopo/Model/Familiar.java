@@ -41,6 +41,9 @@ public class Familiar {
 
     @Column(name="tarjeta_sanitaria",length = 50,unique = true)
     private String tarjetaSanitaria;
+
+    @Column(name = "id_usuario", unique = true, nullable = false)
+    private Long idUsuario;
     
     @Column(nullable = false)
     private boolean activo = true;
@@ -142,6 +145,14 @@ public class Familiar {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
     }
     
 }

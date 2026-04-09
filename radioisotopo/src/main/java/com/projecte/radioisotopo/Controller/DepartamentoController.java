@@ -56,4 +56,29 @@ public class DepartamentoController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    // ADMIN: Obtener todos incluyendo eliminados
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/departamentos/todos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerTodosIncluyendoEliminados() {
+        return ResponseEntity.ok(departamentoService.obtenerTodosIncluyendoEliminados());
+    }
+
+    // ADMIN: Obtener solo eliminados
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/departamentos/eliminados", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerEliminados() {
+        return ResponseEntity.ok(departamentoService.obtenerEliminados());
+    }
+
+    // ADMIN: Obtener por ID incluyendo eliminado
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/departamentos/todos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerPorIdIncluyendoEliminado(@PathVariable Long id) {
+        String fhirJson = departamentoService.obtenerPorIdIncluyendoEliminado(id);
+        if (fhirJson != null) {
+            return ResponseEntity.ok(fhirJson);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

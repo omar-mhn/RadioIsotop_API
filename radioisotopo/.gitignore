@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+ANALYSE_BACKEND.MD
+CHANGES_SUMMARY.md
+SECURITY_JWT_DOCUMENTATION.md

@@ -59,4 +59,43 @@ public class RelojController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    // Obtener relojes disponibles
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    @GetMapping(value = "/relojes/disponibles", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerDisponibles() {
+        return ResponseEntity.ok(relojService.obtenerDisponibles());
+    }
+
+    // Obtener relojes con batería baja
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    @GetMapping(value = "/relojes/bateria-baja", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerBateriaBaja(@RequestParam(defaultValue = "20") Integer nivel) {
+        return ResponseEntity.ok(relojService.obtenerBateriaBaja(nivel));
+    }
+
+    // ADMIN: Obtener todos incluyendo eliminados
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/relojes/todos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerTodosIncluyendoEliminados() {
+        return ResponseEntity.ok(relojService.obtenerTodosIncluyendoEliminados());
+    }
+
+    // ADMIN: Obtener solo eliminados
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/relojes/eliminados", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerEliminados() {
+        return ResponseEntity.ok(relojService.obtenerEliminados());
+    }
+
+    // ADMIN: Obtener por ID incluyendo eliminado
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/relojes/todos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> obtenerPorIdIncluyendoEliminado(@PathVariable Long id) {
+        String fhirJson = relojService.obtenerPorIdIncluyendoEliminado(id);
+        if (fhirJson != null) {
+            return ResponseEntity.ok(fhirJson);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
