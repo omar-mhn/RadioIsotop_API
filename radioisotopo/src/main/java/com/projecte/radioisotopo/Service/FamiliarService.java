@@ -9,9 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projecte.radioisotopo.Model.Familiar;
+import com.projecte.radioisotopo.DTO.FamiliarDTO;
 import com.projecte.radioisotopo.Repository.FamiliarRepository;
 
-import ca.uhn.fhir.context.FhirContext;
+
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -20,14 +21,19 @@ public class FamiliarService {
     @Autowired
     private FamiliarRepository familiarRepository;
 
-    private final IParser fhirParser;
+    @Autowired
+    private IParser fhirParser;
 
-    public FamiliarService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
     //create
-    public String crearFamiliar(Familiar f) {
+    public String crearFamiliar(FamiliarDTO dto) {
+        Familiar f = new Familiar();
+        f.setNombre(dto.nombre());
+        f.setApellido(dto.apellido());
+        f.setNumTelefono(dto.numTelefono());
+        f.setNumDocumento(dto.numDocumento());
+        f.setTipoDocumento(dto.tipoDocumento());
+        f.setTarjetaSanitaria(dto.tarjetaSanitaria());
+        f.setActivo(true);
         return fhirParser.encodeResourceToString(convertirAFhir(familiarRepository.save(f)));
     }
     // read All
@@ -45,18 +51,16 @@ public class FamiliarService {
         }
         return null;
     }
-    // update
-    public String actualizarFamiliar(Long id, Familiar detalles) {
+    public String actualizarFamiliar(Long id, FamiliarDTO dto) {
         Optional<Familiar> famOpt = familiarRepository.findById(id);
         if (famOpt.isPresent()) {
             Familiar f = famOpt.get();
-            f.setNombre(detalles.getNombre());
-            f.setApellido(detalles.getApellido());
-            f.setNumTelefono(detalles.getNumTelefono());
-            f.setEmail(detalles.getEmail());
-            f.setNumDocumento(detalles.getNumDocumento());
-            f.setTipoDocumento(detalles.getTipoDocumento());
-            f.setTarjetaSanitaria(detalles.getTarjetaSanitaria());
+            f.setNombre(dto.nombre());
+            f.setApellido(dto.apellido());
+            f.setNumTelefono(dto.numTelefono());
+            f.setNumDocumento(dto.numDocumento());
+            f.setTipoDocumento(dto.tipoDocumento());
+            f.setTarjetaSanitaria(dto.tarjetaSanitaria());
             
             return fhirParser.encodeResourceToString(convertirAFhir(familiarRepository.save(f)));
         }
@@ -70,6 +74,31 @@ public class FamiliarService {
             return true;
         }
         return false;
+    }
+
+    // Obtener todos los familiares incluyendo eliminados (para ADMIN)
+    public String obtenerTodosIncluyendoEliminados() {
+        List<Familiar> lista = familiarRepository.findAllIncludingInactive();
+        Bundle bundle = new Bundle().setType(Bundle.BundleType.SEARCHSET);
+        for (Familiar f : lista) bundle.addEntry().setResource(convertirAFhir(f));
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener solo los familiares eliminados (para ADMIN)
+    public String obtenerEliminados() {
+        List<Familiar> lista = familiarRepository.findAllInactive();
+        Bundle bundle = new Bundle().setType(Bundle.BundleType.SEARCHSET);
+        for (Familiar f : lista) bundle.addEntry().setResource(convertirAFhir(f));
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener familiar por ID incluyendo eliminados (para ADMIN)
+    public String obtenerPorIdIncluyendoEliminado(Long id) {
+        Optional<Familiar> famOpt = familiarRepository.findByIdIncludingInactive(id);
+        if (famOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(famOpt.get()));
+        }
+        return null;
     }
     // Traductor FHIR
     private RelatedPerson convertirAFhir(Familiar fam) {
@@ -95,11 +124,7 @@ public class FamiliarService {
         // Nom
         fhirFam.addName().setFamily(fam.getApellido()).addGiven(fam.getNombre());
 
-        // Télécom
-        fhirFam.addTelecom().setSystem(ContactPoint.ContactPointSystem.PHONE).setValue(fam.getNumTelefono());
-        if (fam.getEmail() != null) {
-            fhirFam.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL).setValue(fam.getEmail());
-        }
+
 
         return fhirFam;
     }

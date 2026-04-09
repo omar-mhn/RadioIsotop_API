@@ -7,8 +7,9 @@ import org.hl7.fhir.r4.model.Device;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.projecte.radioisotopo.Model.Reloj;
+import com.projecte.radioisotopo.DTO.RelojDTO;
 import com.projecte.radioisotopo.Repository.RelojRepository;
-import ca.uhn.fhir.context.FhirContext;
+
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -17,14 +18,17 @@ public class RelojService {
     @Autowired
     private RelojRepository relojRepository;
 
-    private final IParser fhirParser;
+    @Autowired
+    private IParser fhirParser;
 
-    public RelojService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
     // Create
-    public String crearReloj(Reloj newReloj) {
+    public String crearReloj(RelojDTO dto) {
+        Reloj newReloj = new Reloj();
+        newReloj.setImei(dto.imei());
+        newReloj.setMacAddress(dto.macAddress());
+        newReloj.setEstadoReloj(dto.estadoReloj());
+        newReloj.setBateriaActual(dto.bateriaActual());
+        newReloj.setActivo(true);
         Reloj guardado = relojRepository.save(newReloj);
         return fhirParser.encodeResourceToString(convertirAFhir(guardado));
     }
@@ -46,14 +50,14 @@ public class RelojService {
     }
 
     // UPDATE 
-    public String actualizarReloj(Long id, Reloj detalles) {
+    public String actualizarReloj(Long id, RelojDTO dto) {
         Optional<Reloj> relojOpt = relojRepository.findById(id);
         if (relojOpt.isPresent()) {
             Reloj r = relojOpt.get();
-            r.setImei(detalles.getImei());
-            r.setMacAddress(detalles.getMacAddress());
-            r.setEstadoReloj(detalles.getEstadoReloj());
-            r.setBateriaActual(detalles.getBateriaActual());
+            r.setImei(dto.imei());
+            r.setMacAddress(dto.macAddress());
+            r.setEstadoReloj(dto.estadoReloj());
+            r.setBateriaActual(dto.bateriaActual());
             
             Reloj guardado = relojRepository.save(r);
             return fhirParser.encodeResourceToString(convertirAFhir(guardado));
@@ -67,6 +71,48 @@ public class RelojService {
             return true;
         }
         return false;
+    }
+
+    // Obtener relojes disponibles
+    public String obtenerDisponibles() {
+        List<Reloj> lista = relojRepository.findByEstadoReloj(
+            com.projecte.radioisotopo.Model.EstadoReloj.DISPONIBLE);
+        return crearBundle(lista);
+    }
+
+    // Obtener relojes con batería baja
+    public String obtenerBateriaBaja(Integer nivelMinimo) {
+        List<Reloj> lista = relojRepository.findByBateriaActualLessThan(nivelMinimo);
+        return crearBundle(lista);
+    }
+
+    // Obtener todos incluyendo eliminados (para ADMIN)
+    public String obtenerTodosIncluyendoEliminados() {
+        List<Reloj> lista = relojRepository.findAllIncludingInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener solo eliminados (para ADMIN)
+    public String obtenerEliminados() {
+        List<Reloj> lista = relojRepository.findAllInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener por ID incluyendo eliminados (para ADMIN)
+    public String obtenerPorIdIncluyendoEliminado(Long id) {
+        Optional<Reloj> relojOpt = relojRepository.findByIdIncludingInactive(id);
+        if (relojOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(relojOpt.get()));
+        }
+        return null;
+    }
+
+    // Helper para crear Bundle
+    private String crearBundle(List<Reloj> lista) {
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Reloj r : lista) bundle.addEntry().setResource(convertirAFhir(r));
+        return fhirParser.encodeResourceToString(bundle);
     }
 
     // TRADUCTOR FHIR: Reloj (Java) -> Device (FHIR)

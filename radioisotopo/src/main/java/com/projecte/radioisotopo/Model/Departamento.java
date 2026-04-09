@@ -13,7 +13,7 @@ import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "Departamento")
-@SQLDelete(sql = "UPDATE departamento SET activo = false WHERE id = ?")
+@SQLDelete(sql = "UPDATE Departamento SET activo = false WHERE id = ?")
 @SQLRestriction("activo = true")
 public class Departamento {
     @Id
@@ -40,12 +40,11 @@ public class Departamento {
     public Departamento() {
     }
 
-    public Departamento(Long id, String nombre, String centro, String ubicacion, String email) {
-        this.id = id;
+    public Departamento(String nombre, String centro, String ubicacion, String email) {
         this.nombre = nombre;
         this.centro = centro;
         this.ubicacion = ubicacion;
-        this.email = email;
+        this.email = email; 
         this.activo = true;
     }
 

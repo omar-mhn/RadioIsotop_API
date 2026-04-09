@@ -11,9 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projecte.radioisotopo.Model.Doctor;
+import com.projecte.radioisotopo.Model.Departamento;
+import com.projecte.radioisotopo.DTO.DoctorDTO;
 import com.projecte.radioisotopo.Repository.DoctorRepository;
+import com.projecte.radioisotopo.Repository.DepartamentoRepository;
 
-import ca.uhn.fhir.context.FhirContext;
+
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -22,15 +25,24 @@ public class DoctorService {
     @Autowired 
     DoctorRepository doctorRepository;
 
-    private final IParser fhirParser;
+    @Autowired
+    DepartamentoRepository departamentoRepository;
 
-    
-    public DoctorService(){
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
+    @Autowired
+    private IParser fhirParser;
+
     // create
-    public String crearDoctor(Doctor newDoctor){
+    public String crearDoctor(DoctorDTO dto){
+        Doctor newDoctor = new Doctor();
+        newDoctor.setNombre(dto.nombre());
+        newDoctor.setApellido(dto.apellido());
+        newDoctor.setNumColegiado(dto.numColegiado());
+        newDoctor.setFotoPerfil(dto.fotoPerfil());
+        newDoctor.setActivo(true);
+        if (dto.departamentoId() != null) {
+            Departamento d = departamentoRepository.findById(dto.departamentoId()).orElse(null);
+            newDoctor.setDepartamento(d);
+        }
         Doctor doctorGuardado = doctorRepository.save(newDoctor);
         return fhirParser.encodeResourceToString(convertirAFhir(doctorGuardado));
     }
@@ -53,20 +65,23 @@ public class DoctorService {
         return null;
     }
     // update
-    public String actualizarDoctor(Long id, Doctor detallesActualizados) {
+    public String actualizarDoctor(Long id, DoctorDTO dto) {
         Optional<Doctor> doctorOpt = doctorRepository.findById(id);
         
         if (doctorOpt.isPresent()) {
             Doctor doctorExistente = doctorOpt.get();
             
-            doctorExistente.setNombre(detallesActualizados.getNombre());
-            doctorExistente.setApellido(detallesActualizados.getApellido());
-            doctorExistente.setEmail(detallesActualizados.getEmail());
-            doctorExistente.setNumColegiado(detallesActualizados.getNumColegiado());
-            doctorExistente.setRol(detallesActualizados.getRol());
-            doctorExistente.setFotoPerfil(detallesActualizados.getFotoPerfil());
+            doctorExistente.setNombre(dto.nombre());
+            doctorExistente.setApellido(dto.apellido());
+            doctorExistente.setNumColegiado(dto.numColegiado());
+            doctorExistente.setFotoPerfil(dto.fotoPerfil());
             // Actualizamos el departamento asignado
-            doctorExistente.setDepartamento(detallesActualizados.getDepartamento());
+            if (dto.departamentoId() != null) {
+                Departamento d = departamentoRepository.findById(dto.departamentoId()).orElse(null);
+                doctorExistente.setDepartamento(d);
+            } else {
+                doctorExistente.setDepartamento(null);
+            }
            
             
             Doctor doctorActualizado = doctorRepository.save(doctorExistente);
@@ -82,6 +97,52 @@ public class DoctorService {
             return true;
         }
         return false;
+    }
+
+    // Obtenir les données du docteur par son ID utilisateur
+    public String obtenerDoctorPorIdUsuario(Long idUsuario) {
+        Optional<Doctor> doctorOpt = doctorRepository.findByIdUsuario(idUsuario);
+        if (doctorOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(doctorOpt.get()));
+        }
+        return null;
+    }
+
+    // Obtenir l'ID du docteur par son ID utilisateur
+    public Long obtenerIdDoctorPorIdUsuario(Long idUsuario) {
+        Optional<Doctor> doctorOpt = doctorRepository.findByIdUsuario(idUsuario);
+        return doctorOpt.map(Doctor::getId).orElse(null);
+    }
+
+    // Obtener todos los doctores incluyendo eliminados (para ADMIN)
+    public String obtenerTodosLosDoctoresIncluyendoEliminados() {
+        List<Doctor> doctores = doctorRepository.findAllIncludingInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Doctor d : doctores) {
+            bundle.addEntry().setResource(convertirAFhir(d));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener solo los doctores eliminados (para ADMIN)
+    public String obtenerDoctoresEliminados() {
+        List<Doctor> doctores = doctorRepository.findAllInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Doctor d : doctores) {
+            bundle.addEntry().setResource(convertirAFhir(d));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener doctor por ID incluyendo eliminados (para ADMIN)
+    public String obtenerDoctorPorIdIncluyendoEliminado(Long id) {
+        Optional<Doctor> doctorOpt = doctorRepository.findByIdIncludingInactive(id);
+        if (doctorOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(doctorOpt.get()));
+        }
+        return null;
     }
 
     // TRADUCTOR FHIR: Doctor (Java) -> Practitioner (FHIR)
@@ -102,12 +163,6 @@ public class DoctorService {
             .addGiven(miDoctor.getNombre())
             .setFamily(miDoctor.getApellido());
             
-        // Email
-        if (miDoctor.getEmail() != null) {
-            fhirPractitioner.addTelecom()
-                .setSystem(ContactPoint.ContactPointSystem.EMAIL)
-                .setValue(miDoctor.getEmail());
-        }
         // foto
         if (miDoctor.getFotoPerfil() != null) {
             fhirPractitioner.addPhoto()

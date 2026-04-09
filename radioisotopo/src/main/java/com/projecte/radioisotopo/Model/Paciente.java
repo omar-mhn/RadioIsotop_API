@@ -20,7 +20,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name ="Paciente")
-@SQLDelete(sql = "UPDATE paciente SET activo = false WHERE id = ?")
+@SQLDelete(sql = "UPDATE Paciente SET activo = false WHERE id = ?")
 @SQLRestriction("activo = true")
 public class Paciente {
     @Id
@@ -36,9 +36,6 @@ public class Paciente {
     @Column(name = "num_telefono" ,length = 20, nullable = false,unique = true)
     private String numTelefono;
 
-    @Column()
-    private String email;
-
     @Column(name = "num_documento", length = 20, nullable = false, unique = true)
     private String numDocumento; 
 
@@ -53,6 +50,9 @@ public class Paciente {
 
     @Column(name = "foto_perfil") 
     private String fotoPerfil;
+
+    @Column(name = "id_usuario", unique = true, nullable = false)
+    private Long idUsuario;
 
     @Column(nullable = false)
     private boolean activo = true;
@@ -83,14 +83,12 @@ public class Paciente {
 
     
 
-    public Paciente(Long id, String nombre, String apellido, String numTelefono, String email, String numDocumento,
+    public Paciente(String nombre, String apellido, String numTelefono, String numDocumento,
             String tipoDocumento, String tarjetaSanitaria, Date fechaNacimiento, String fotoPerfil, Double peso,
             Double altura, Departamento departamento, List<Familiar> familiares) {
-        this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.numTelefono = numTelefono;
-        this.email = email;
         this.numDocumento = numDocumento;
         this.tipoDocumento = tipoDocumento;
         this.tarjetaSanitaria = tarjetaSanitaria;
@@ -136,14 +134,6 @@ public class Paciente {
 
     public void setNumTelefono(String numTelefono) {
         this.numTelefono = numTelefono;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
     public String getTarjetaSanitaria() {
         return tarjetaSanitaria;
@@ -223,6 +213,14 @@ public class Paciente {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
     }
     
     

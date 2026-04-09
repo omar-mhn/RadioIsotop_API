@@ -1,11 +1,13 @@
 package com.projecte.radioisotopo.Controller;
 
-import com.projecte.radioisotopo.Model.Familiar;
+import com.projecte.radioisotopo.DTO.FamiliarDTO;
+import jakarta.validation.Valid;
 import com.projecte.radioisotopo.Service.FamiliarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,20 +17,20 @@ public class FamiliarController {
     @Autowired
     private FamiliarService familiarService;
 
-    // 1. CREATE - POST /api/familiares
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     @PostMapping(value = "/familiares", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> crearFamiliar(@RequestBody Familiar nuevoFamiliar) {
-        String fhirJson = familiarService.crearFamiliar(nuevoFamiliar);
-        return ResponseEntity.status(HttpStatus.CREATED).body(fhirJson);
+    public ResponseEntity<String> crearFamiliar(@Valid @RequestBody FamiliarDTO dto) {
+        String fhirJson = familiarService.crearFamiliar(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Familiar creado !");
     }
 
-    // 2. READ ALL - GET /api/familiares
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @GetMapping(value = "/familiares", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> obtenerTodos() {
         return ResponseEntity.ok(familiarService.obtenerTodos());
     }
 
-    // 3. READ ONE - GET /api/familiares/{id}
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @GetMapping(value = "/familiares/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> obtenerPorId(@PathVariable Long id) {
         String fhirJson = familiarService.obtenerPorId(id);
@@ -38,17 +40,17 @@ public class FamiliarController {
         return ResponseEntity.notFound().build();
     }
 
-    // 4. UPDATE - PUT /api/familiares/{id}
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @PutMapping(value = "/familiares/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> actualizar(@PathVariable Long id, @RequestBody Familiar detalles) {
-        String fhirJson = familiarService.actualizarFamiliar(id, detalles);
+    public ResponseEntity<String> actualizar(@PathVariable Long id, @Valid @RequestBody FamiliarDTO dto) {
+        String fhirJson = familiarService.actualizarFamiliar(id, dto);
         if (fhirJson != null) {
             return ResponseEntity.ok(fhirJson);
         }
         return ResponseEntity.notFound().build();
     }
 
-    // 5. DELETE - DELETE /api/familiares/{id}
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/familiares/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         if (familiarService.eliminarFamiliar(id)) {
@@ -56,4 +58,28 @@ public class FamiliarController {
         }
         return ResponseEntity.notFound().build();
     }
-} 
+
+    // Endpoints pour ADMIN - voir les enregistrements supprimés
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/familiares/todos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getAllFamiliaresIncluyendoEliminados() {
+        return ResponseEntity.ok(familiarService.obtenerTodosIncluyendoEliminados());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/familiares/eliminados", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getFamiliaresEliminados() {
+        return ResponseEntity.ok(familiarService.obtenerEliminados());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/familiares/todos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getFamiliarByIdIncluyendoEliminado(@PathVariable Long id) {
+        String fhirJson = familiarService.obtenerPorIdIncluyendoEliminado(id);
+        if (fhirJson != null) {
+            return ResponseEntity.ok(fhirJson);
+        }
+        return ResponseEntity.notFound().build();
+    }
+}

@@ -16,7 +16,7 @@ import jakarta.persistence.Column;
 
         @Entity
         @Table(name ="Doctor")
-        @SQLDelete(sql = "UPDATE doctor SET activo = false WHERE id = ?")
+        @SQLDelete(sql = "UPDATE Doctor SET activo = false WHERE id = ?")
         @SQLRestriction("activo = true")
         public class Doctor {
             @Id
@@ -29,18 +29,14 @@ import jakarta.persistence.Column;
             @Column(length = 100, nullable = false)
             private String apellido;
 
-            @Column(length = 100, nullable = false,unique = true)
-            private String email;
-
             @Column(name="num_colegiado",length = 50)
             private String numColegiado;
 
-            @Enumerated(EnumType.STRING)
-            @Column(nullable = false)
-            private RolDoctor rol;
-
             @Column(name = "foto_perfil") 
             private String fotoPerfil;
+
+            @Column(name = "id_usuario", unique = true, nullable = false)
+            private Long idUsuario;
 
             @Column(nullable = false)
             private boolean activo = true;
@@ -53,16 +49,12 @@ import jakarta.persistence.Column;
 
             
 
-            public Doctor(Long id, String nombre, String apellido, String email, String numColegiado, RolDoctor rol,
-                    String fotoPerfil, boolean activo, Departamento departamento) {
-                this.id = id;
+            public Doctor( String nombre, String apellido, String email, String numColegiado,
+                    String fotoPerfil, Departamento departamento) {
                 this.nombre = nombre;
                 this.apellido = apellido;
-                this.email = email;
                 this.numColegiado = numColegiado;
-                this.rol = rol;
                 this.fotoPerfil = fotoPerfil;
-                this.activo = activo;
                 this.departamento = departamento;
                 this.activo = true;
             }
@@ -92,14 +84,6 @@ import jakarta.persistence.Column;
                 this.apellido = apellido;
             }
 
-            public String getEmail() {
-                return email;
-            }
-
-            public void setEmail(String email) {
-                this.email = email;
-            }
-
             public String getNumColegiado() {
                 return numColegiado;
             }
@@ -107,15 +91,6 @@ import jakarta.persistence.Column;
             public void setNumColegiado(String num_colegiado) {
                 this.numColegiado = num_colegiado;
             }
-
-            public RolDoctor getRol() {
-                return rol;
-            }
-
-            public void setRol(RolDoctor rol) {
-                this.rol = rol;
-            }
-
             public Departamento getDepartamento() {
                 return departamento;
             }
@@ -136,6 +111,14 @@ import jakarta.persistence.Column;
             }
             public void setFotoPerfil(String fotoPerfil) {
                 this.fotoPerfil = fotoPerfil;
+            }
+
+            public Long getIdUsuario() {
+                return idUsuario;
+            }
+
+            public void setIdUsuario(Long idUsuario) {
+                this.idUsuario = idUsuario;
             }
             
             

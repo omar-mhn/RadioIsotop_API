@@ -12,9 +12,13 @@ import org.springframework.stereotype.Service;
 
 import com.projecte.radioisotopo.Model.Familiar;
 import com.projecte.radioisotopo.Model.Paciente;
+import com.projecte.radioisotopo.Model.Departamento;
+import com.projecte.radioisotopo.DTO.PacienteDTO;
 import com.projecte.radioisotopo.Repository.PacienteRepository;
+import com.projecte.radioisotopo.Repository.FamiliarRepository;
+import com.projecte.radioisotopo.Repository.DepartamentoRepository;
+import java.util.ArrayList;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -23,14 +27,40 @@ public class PacienteService {
     @Autowired 
     PacienteRepository pacienteRepository;
 
-    private final IParser fhirParser;
+    @Autowired
+    FamiliarRepository familiarRepository;
 
-    public PacienteService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
+    @Autowired
+    DepartamentoRepository departamentoRepository;
+
+    @Autowired
+    private IParser fhirParser;
+
     // Crear un nuevo paciente
-    public String createPacient(Paciente nuevoPaciente){
+    public String createPacient(PacienteDTO dto){
+        Paciente nuevoPaciente = new Paciente();
+        nuevoPaciente.setNombre(dto.nombre());
+        nuevoPaciente.setApellido(dto.apellido());
+        nuevoPaciente.setNumTelefono(dto.numTelefono());
+        nuevoPaciente.setNumDocumento(dto.numDocumento());
+        nuevoPaciente.setTipoDocumento(dto.tipoDocumento());
+        nuevoPaciente.setTarjetaSanitaria(dto.tarjetaSanitaria());
+        nuevoPaciente.setFechaNacimiento(dto.fechaNacimiento());
+        nuevoPaciente.setFotoPerfil(dto.fotoPerfil());
+        nuevoPaciente.setPeso(dto.peso());
+        nuevoPaciente.setAltura(dto.altura());
+        nuevoPaciente.setActivo(true);
+
+        if (dto.departamentoId() != null) {
+            Departamento d = departamentoRepository.findById(dto.departamentoId()).orElse(null);
+            nuevoPaciente.setDepartamento(d);
+        }
+        
+        if (dto.familiarIds() != null && !dto.familiarIds().isEmpty()) {
+            List<Familiar> familiares = familiarRepository.findAllById(dto.familiarIds());
+            nuevoPaciente.setFamiliares(familiares);
+        }
+
         Paciente pacienteGuardado = pacienteRepository.save(nuevoPaciente);
         // Lo devolvemos traducido al mundo FHIR
         return fhirParser.encodeResourceToString(convertirAFhir(pacienteGuardado));
@@ -63,28 +93,38 @@ public class PacienteService {
 
     // Actualizar un paciente
 
-    public String actualizarPaciente(Long id, Paciente detallesActualizados) {
+    public String actualizarPaciente(Long id, PacienteDTO dto) {
         Optional<Paciente> paciente = pacienteRepository.findById(id);
         
         if (paciente.isPresent()) {
             Paciente pacienteExistente = paciente.get();
             
             // Actualizamos los datos locales
-            pacienteExistente.setNombre(detallesActualizados.getNombre());
-            pacienteExistente.setApellido(detallesActualizados.getApellido());
-            pacienteExistente.setNumTelefono(detallesActualizados.getNumTelefono());
-            pacienteExistente.setEmail(detallesActualizados.getEmail());
-            pacienteExistente.setNumDocumento(detallesActualizados.getNumDocumento());
-            pacienteExistente.setTipoDocumento(detallesActualizados.getTipoDocumento());
-            pacienteExistente.setTarjetaSanitaria(detallesActualizados.getTarjetaSanitaria());
-            pacienteExistente.setFechaNacimiento(detallesActualizados.getFechaNacimiento());
-            pacienteExistente.setPeso(detallesActualizados.getPeso());
-            pacienteExistente.setAltura(detallesActualizados.getAltura());
-            pacienteExistente.setFotoPerfil(detallesActualizados.getFotoPerfil());
+            pacienteExistente.setNombre(dto.nombre());
+            pacienteExistente.setApellido(dto.apellido());
+            pacienteExistente.setNumTelefono(dto.numTelefono());
+            pacienteExistente.setNumDocumento(dto.numDocumento());
+            pacienteExistente.setTipoDocumento(dto.tipoDocumento());
+            pacienteExistente.setTarjetaSanitaria(dto.tarjetaSanitaria());
+            pacienteExistente.setFechaNacimiento(dto.fechaNacimiento());
+            pacienteExistente.setPeso(dto.peso());
+            pacienteExistente.setAltura(dto.altura());
+            pacienteExistente.setFotoPerfil(dto.fotoPerfil());
             
             // Actualizamos el departamento y los familiares
-            pacienteExistente.setDepartamento(detallesActualizados.getDepartamento());
-            pacienteExistente.setFamiliares(detallesActualizados.getFamiliares());
+            if (dto.departamentoId() != null) {
+                Departamento d = departamentoRepository.findById(dto.departamentoId()).orElse(null);
+                pacienteExistente.setDepartamento(d);
+            } else {
+                pacienteExistente.setDepartamento(null);
+            }
+
+            if (dto.familiarIds() != null && !dto.familiarIds().isEmpty()) {
+                List<Familiar> familiares = familiarRepository.findAllById(dto.familiarIds());
+                pacienteExistente.setFamiliares(familiares);
+            } else {
+                pacienteExistente.setFamiliares(new ArrayList<>());
+            }
             // Guardamos y devolvemos en formato FHIR
             Paciente pacienteActualizado = pacienteRepository.save(pacienteExistente);
             return fhirParser.encodeResourceToString(convertirAFhir(pacienteActualizado));
@@ -99,6 +139,69 @@ public class PacienteService {
             return true; 
         }
         return false; 
+    }
+
+    // Obtener paciente por ID de usuario (para acceso del propio paciente)
+    public String leerPacientePorIdUsuario(Long idUsuario) {
+        Optional<Paciente> paciente = pacienteRepository.findByIdUsuario(idUsuario);
+        if (paciente.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(paciente.get()));
+        }
+        return null;
+    }
+
+    // Obtener ID del paciente por ID de usuario
+    public Long obtenerIdPacientePorIdUsuario(Long idUsuario) {
+        Optional<Paciente> paciente = pacienteRepository.findByIdUsuario(idUsuario);
+        return paciente.map(Paciente::getId).orElse(null);
+    }
+
+    // Obtener pacientes asociados a un familiar (por ID de usuario del familiar)
+    public String leerPacientesPorFamiliar(Long idUsuarioFamiliar) {
+        List<Paciente> pacientes = familiarRepository.findPacientesByIdUsuario(idUsuarioFamiliar);
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Paciente p : pacientes) {
+            bundle.addEntry().setResource(convertirAFhir(p));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Verificar si un familiar tiene acceso a un paciente específico
+    public boolean familiarTieneAccesoAPaciente(Long idUsuarioFamiliar, Long pacienteId) {
+        List<Paciente> pacientes = familiarRepository.findPacientesByIdUsuario(idUsuarioFamiliar);
+        return pacientes.stream().anyMatch(p -> p.getId().equals(pacienteId));
+    }
+
+    // Obtener todos los pacientes incluyendo eliminados (para ADMIN)
+    public String leerTodosPacientesIncluyendoEliminados() {
+        List<Paciente> pacientes = pacienteRepository.findAllIncludingInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Paciente p : pacientes) {
+            bundle.addEntry().setResource(convertirAFhir(p));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener solo los pacientes eliminados (para ADMIN)
+    public String leerPacientesEliminados() {
+        List<Paciente> pacientes = pacienteRepository.findAllInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Paciente p : pacientes) {
+            bundle.addEntry().setResource(convertirAFhir(p));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener paciente por ID incluyendo eliminados (para ADMIN)
+    public String leerPacientePorIdIncluyendoEliminado(Long id) {
+        Optional<Paciente> paciente = pacienteRepository.findByIdIncludingInactive(id);
+        if (paciente.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(paciente.get()));
+        }
+        return null;
     }
 
     // TRADUCTOR FHIR: Mapea Paciente (Java) -> Patient (FHIR)
@@ -136,12 +239,6 @@ public class PacienteService {
             .setSystem(ContactPoint.ContactPointSystem.PHONE)
             .setValue(miPaciente.getNumTelefono());
 
-        // Email (Solo si lo tiene registrado)
-        if (miPaciente.getEmail() != null) {
-            fhirPatient.addTelecom()
-                .setSystem(ContactPoint.ContactPointSystem.EMAIL)
-                .setValue(miPaciente.getEmail());
-        }
         // foto perfil
         if (miPaciente.getFotoPerfil() != null) {
             fhirPatient.addPhoto().setUrl(miPaciente.getFotoPerfil());

@@ -1,12 +1,16 @@
 package com.projecte.radioisotopo.Service;
 
+
 import java.util.List;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.projecte.radioisotopo.Model.Telemetria;
+import com.projecte.radioisotopo.Model.Tratamiento;
+import com.projecte.radioisotopo.DTO.TelemetriaDTO;
 import com.projecte.radioisotopo.Repository.TelemetriaRepository;
-import ca.uhn.fhir.context.FhirContext;
+import com.projecte.radioisotopo.Repository.TratamientoRepository;
+
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -15,15 +19,25 @@ public class TelemetriaService {
     @Autowired
     private TelemetriaRepository telemetriaRepository;
 
-    private final IParser fhirParser;
+    @Autowired
+    private TratamientoRepository tratamientoRepository;
 
-    public TelemetriaService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
+    @Autowired
+    private IParser fhirParser;
 
     // Registrar una nueva lectura de la pulsera
-    public String registrarDato(Telemetria t) {
+    public String registrarDato(TelemetriaDTO dto) {
+        Telemetria t = new Telemetria();
+        t.setFrecuenciaCardiaca(dto.frecuenciaCardiaca());
+        t.setRadiacionActual(dto.radiacionActual());
+        t.setTemperatura(dto.temperatura());
+        t.setPasosAcumulados(dto.pasosAcumulados());
+        t.setFechaHora(dto.fechaHora());
+        
+        if (dto.tratamientoId() != null) {
+            t.setTratamiento(tratamientoRepository.findById(dto.tratamientoId()).orElse(null));
+        }
+        
         Telemetria guardado = telemetriaRepository.save(t);
         return fhirParser.encodeResourceToString(convertirAFhir(guardado));
     }
@@ -39,7 +53,54 @@ public class TelemetriaService {
         return fhirParser.encodeResourceToString(bundle);
     }
 
-    
+    // Obtener telemetría de un paciente específico
+    public String obtenerPorPaciente(Long pacienteId) {
+        List<Telemetria> lista = telemetriaRepository.findByTratamientoPacienteId(pacienteId);
+        return crearBundle(lista);
+    }
+
+    // Obtener por ID
+    public String obtenerPorId(Long id) {
+        return telemetriaRepository.findById(id)
+            .map(t -> fhirParser.encodeResourceToString(convertirAFhir(t)))
+            .orElse(null);
+    }
+
+    // Obtener por tratamiento
+    public String obtenerPorTratamiento(Long tratamientoId) {
+        List<Telemetria> lista = telemetriaRepository.findByTratamientoId(tratamientoId);
+        return crearBundle(lista);
+    }
+
+    // Obtener todos incluyendo eliminados (ADMIN)
+    public String obtenerTodosIncluyendoEliminados() {
+        List<Telemetria> lista = telemetriaRepository.findAllIncludingInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener solo eliminados (ADMIN)
+    public String obtenerEliminados() {
+        List<Telemetria> lista = telemetriaRepository.findAllInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener por ID incluyendo eliminado (ADMIN)
+    public String obtenerPorIdIncluyendoEliminado(Long id) {
+        return telemetriaRepository.findByIdIncludingInactive(id)
+            .map(t -> fhirParser.encodeResourceToString(convertirAFhir(t)))
+            .orElse(null);
+    }
+
+    // Helper para crear Bundle
+    private String crearBundle(List<Telemetria> lista) {
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Telemetria t : lista) {
+            bundle.addEntry().setResource(convertirAFhir(t));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
     // TRADUCTOR FHIR: Telemetria -> Observation (Vital Signs)
    
     private Observation convertirAFhir(Telemetria t) {
@@ -68,9 +129,16 @@ public class TelemetriaService {
             heartRate.setValue(new Quantity().setValue(t.getFrecuenciaCardiaca()).setUnit("bpm"));
         }
 
+        // Componente: Temperatura
+        if (t.getTemperatura() != null) {
+            Observation.ObservationComponentComponent temp = obs.addComponent();
+            temp.getCode().addCoding().setSystem("http://loinc.org").setCode("8310-5").setDisplay("Body temperature");
+            temp.setValue(new Quantity().setValue(t.getTemperatura()).setUnit("Cel"));
+        }
+
         // Componente: Radiación Actual (Dato clave de tu proyecto)
         Observation.ObservationComponentComponent radiation = obs.addComponent();
-        radiation.getCode().addCoding().setSystem("http://loinc.org").setCode("8302-2").setDisplay("Radiation level");
+        radiation.getCode().addCoding().setSystem("http://loinc.org").setCode("93006-5").setDisplay("Radiation level");
         radiation.setValue(new Quantity().setValue(t.getRadiacionActual()).setUnit("µSv/h"));
 
         // Componente: Pasos Acumulados

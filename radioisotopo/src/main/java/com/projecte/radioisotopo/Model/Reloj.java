@@ -1,5 +1,8 @@
 package com.projecte.radioisotopo.Model;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +13,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 @Entity
 @Table(name= "Reloj")
+@SQLDelete(sql = "UPDATE Reloj SET activo = false WHERE id = ?")
+@SQLRestriction("activo = true")
 public class Reloj {
    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,12 +33,16 @@ public class Reloj {
     @Column(name = "bateria_actual")
     private int bateriaActual;
 
-    public Reloj(Long id, String imei, String macAddress, EstadoReloj estadoReloj, int bateriaActual) {
-        this.id = id;
+    @Column(nullable = false)
+    private boolean activo = true;
+
+    public Reloj(String imei, String macAddress, EstadoReloj estadoReloj, int bateriaActual) {
+        
         this.imei = imei;
         this.macAddress = macAddress;
         this.estadoReloj = estadoReloj;
         this.bateriaActual = bateriaActual;
+        this.activo =true;
     }
 
     public Reloj() {
@@ -79,5 +88,14 @@ public class Reloj {
         this.bateriaActual = bateriaActual;
     }
 
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    
     
 }

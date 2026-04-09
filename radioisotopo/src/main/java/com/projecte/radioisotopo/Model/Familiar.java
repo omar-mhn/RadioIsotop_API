@@ -12,10 +12,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="Familiar")
-@SQLDelete(sql = "UPDATE familiar SET activo = false WHERE id = ?")
+@SQLDelete(sql = "UPDATE Familiar SET activo = false WHERE id = ?")
 @SQLRestriction("activo = true")
 public class Familiar {
     @Id
@@ -32,9 +33,6 @@ public class Familiar {
     private String numTelefono;
 
 
-    @Column(length = 100)
-    private String email;
-
     @Column(name = "num_documento", length = 20, nullable = false, unique = true)
     private String numDocumento; 
 
@@ -43,6 +41,9 @@ public class Familiar {
 
     @Column(name="tarjeta_sanitaria",length = 50,unique = true)
     private String tarjetaSanitaria;
+
+    @Column(name = "id_usuario", unique = true, nullable = false)
+    private Long idUsuario;
     
     @Column(nullable = false)
     private boolean activo = true;
@@ -51,17 +52,17 @@ public class Familiar {
     // porque allí ya están todas las reglas de la tabla "Contacto".
 
     @ManyToMany(mappedBy = "familiares")
+    @JsonIgnore
     private List<Paciente> pacientes; // Una lista porque son "Muchos" pacientes
 
     
 
-    public Familiar(Long id, String nombre, String apellido, String numTelefono, String email, String numDocumento,
+    public Familiar( String nombre, String apellido, String numTelefono, String numDocumento,
             String tipoDocumento, String tarjetaSanitaria, List<Paciente> pacientes) {
-        this.id = id;
+        
         this.nombre = nombre;
         this.apellido = apellido;
         this.numTelefono = numTelefono;
-        this.email = email;
         this.numDocumento = numDocumento;
         this.tipoDocumento = tipoDocumento;
         this.tarjetaSanitaria = tarjetaSanitaria;
@@ -104,14 +105,6 @@ public class Familiar {
         this.numTelefono = numTelefono;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     
 
     public String getNumDocumento() {
@@ -152,6 +145,14 @@ public class Familiar {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
     }
     
 }

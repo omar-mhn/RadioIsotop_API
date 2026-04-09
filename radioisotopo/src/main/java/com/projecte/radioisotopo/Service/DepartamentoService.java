@@ -2,12 +2,12 @@ package com.projecte.radioisotopo.Service;
 
 
 import com.projecte.radioisotopo.Model.Departamento;
+import com.projecte.radioisotopo.DTO.DepartamentoDTO;
 import com.projecte.radioisotopo.Repository.DepartamentoRepository;
 
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Organization;
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +21,17 @@ public class DepartamentoService {
     @Autowired
     private DepartamentoRepository departamentoRepository;
 
-    private final IParser fhirParser;
-
-    public DepartamentoService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
+    @Autowired
+    private IParser fhirParser;
 
     // Create
-    public String crearDepartamento(Departamento dep) {
+    public String crearDepartamento(DepartamentoDTO dto) {
+        Departamento dep = new Departamento();
+        dep.setNombre(dto.nombre());
+        dep.setCentro(dto.centro());
+        dep.setUbicacion(dto.ubicacion());
+        dep.setEmail(dto.email());
+        dep.setActivo(true);
         return fhirParser.encodeResourceToString(convertirAFhir(departamentoRepository.save(dep)));
     }
     // read all
@@ -49,17 +51,17 @@ public class DepartamentoService {
         return null;
     }
     // uppdte
-    public String actualizarDepartamento(Long id, Departamento detallesActualizados) {
+    public String actualizarDepartamento(Long id, DepartamentoDTO dto) {
         Optional<Departamento> depOpt = departamentoRepository.findById(id);
 
         if (depOpt.isPresent()) {
             Departamento depExistente = depOpt.get();
 
             
-            depExistente.setNombre(detallesActualizados.getNombre());
-            depExistente.setCentro(detallesActualizados.getCentro());
-            depExistente.setUbicacion(detallesActualizados.getUbicacion());
-            depExistente.setEmail(detallesActualizados.getEmail());
+            depExistente.setNombre(dto.nombre());
+            depExistente.setCentro(dto.centro());
+            depExistente.setUbicacion(dto.ubicacion());
+            depExistente.setEmail(dto.email());
             
 
             
@@ -75,6 +77,33 @@ public class DepartamentoService {
             return true;
         }
         return false;
+    }
+
+    // Obtener todos incluyendo eliminados (para ADMIN)
+    public String obtenerTodosIncluyendoEliminados() {
+        List<Departamento> lista = departamentoRepository.findAllIncludingInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Departamento d : lista) bundle.addEntry().setResource(convertirAFhir(d));
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener solo eliminados (para ADMIN)
+    public String obtenerEliminados() {
+        List<Departamento> lista = departamentoRepository.findAllInactive();
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Departamento d : lista) bundle.addEntry().setResource(convertirAFhir(d));
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
+    // Obtener por ID incluyendo eliminados (para ADMIN)
+    public String obtenerPorIdIncluyendoEliminado(Long id) {
+        Optional<Departamento> depOpt = departamentoRepository.findByIdIncludingInactive(id);
+        if (depOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(depOpt.get()));
+        }
+        return null;
     }
 
     // TRADUCTOR FHIR: Departamento (Java) -> Organization (FHIR)

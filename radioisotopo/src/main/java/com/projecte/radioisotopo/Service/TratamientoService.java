@@ -12,9 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projecte.radioisotopo.Model.Tratamiento;
+import com.projecte.radioisotopo.Model.Paciente;
+import com.projecte.radioisotopo.Model.Reloj;
+import com.projecte.radioisotopo.Model.Doctor;
+import com.projecte.radioisotopo.DTO.TratamientoDTO;
 import com.projecte.radioisotopo.Repository.TratamientoRepository;
+import com.projecte.radioisotopo.Repository.PacienteRepository;
+import com.projecte.radioisotopo.Repository.RelojRepository;
+import com.projecte.radioisotopo.Repository.DoctorRepository;
 
-import ca.uhn.fhir.context.FhirContext;
+
 import ca.uhn.fhir.parser.IParser;
 
 @Service
@@ -23,15 +30,37 @@ public class TratamientoService {
     @Autowired
     private TratamientoRepository tratamientoRepository;
 
-    private final IParser fhirParser;
+    @Autowired
+    private PacienteRepository pacienteRepository;
 
-    public TratamientoService() {
-        FhirContext ctx = FhirContext.forR4();
-        this.fhirParser = ctx.newJsonParser().setPrettyPrint(true);
-    }
+    @Autowired
+    private RelojRepository relojRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
+    private IParser fhirParser;
 
     // Crear un nuevo tratamiento (CarePlan)
-    public String crearTratamiento(Tratamiento t) {
+    public String crearTratamiento(TratamientoDTO dto) {
+        Tratamiento t = new Tratamiento();
+        t.setTipoIsotopo(dto.tipoIsotopo());
+        t.setDosisInicial(dto.dosisInicial());
+        t.setFechaAdministracion(dto.fechaAdministracion());
+        t.setFechaFinalEstimada(dto.fechaFinalEstimada());
+        t.setEstadoTratamiento(dto.estadoTratamiento());
+        
+        if (dto.pacienteId() != null) {
+            t.setPaciente(pacienteRepository.findById(dto.pacienteId()).orElse(null));
+        }
+        if (dto.relojId() != null) {
+            t.setReloj(relojRepository.findById(dto.relojId()).orElse(null));
+        }
+        if (dto.doctorId() != null) {
+            t.setDoctor(doctorRepository.findById(dto.doctorId()).orElse(null));
+        }
+
         Tratamiento guardado = tratamientoRepository.save(t);
         return fhirParser.encodeResourceToString(convertirAFhir(guardado));
     }
@@ -57,18 +86,33 @@ public class TratamientoService {
     }
 
     // Actualizar el tratamiento
-    public String actualizarTratamiento(Long id, Tratamiento detalles) {
+    public String actualizarTratamiento(Long id, TratamientoDTO dto) {
         Optional<Tratamiento> tOpt = tratamientoRepository.findById(id);
         if (tOpt.isPresent()) {
             Tratamiento t = tOpt.get();
-            t.setTipoIsotopo(detalles.getTipoIsotopo());
-            t.setDosisInicial(detalles.getDosisInicial());
-            t.setFechaAdministracion(detalles.getFechaAdministracion());
-            t.setFechaFinalEstimada(detalles.getFechaFinalEstimada());
-            t.setEstadoTratamiento(detalles.getEstadoTratamiento());
-            t.setPaciente(detalles.getPaciente());
-            t.setReloj(detalles.getReloj());
-            t.setDoctor(detalles.getDoctor());
+            t.setTipoIsotopo(dto.tipoIsotopo());
+            t.setDosisInicial(dto.dosisInicial());
+            t.setFechaAdministracion(dto.fechaAdministracion());
+            t.setFechaFinalEstimada(dto.fechaFinalEstimada());
+            t.setEstadoTratamiento(dto.estadoTratamiento());
+            
+            if (dto.pacienteId() != null) {
+                t.setPaciente(pacienteRepository.findById(dto.pacienteId()).orElse(null));
+            } else {
+                t.setPaciente(null);
+            }
+            
+            if (dto.relojId() != null) {
+                t.setReloj(relojRepository.findById(dto.relojId()).orElse(null));
+            } else {
+                t.setReloj(null);
+            }
+            
+            if (dto.doctorId() != null) {
+                t.setDoctor(doctorRepository.findById(dto.doctorId()).orElse(null));
+            } else {
+                t.setDoctor(null);
+            }
             
             return fhirParser.encodeResourceToString(convertirAFhir(tratamientoRepository.save(t)));
         }
@@ -83,13 +127,78 @@ public class TratamientoService {
         }
         return false;
     }
+
+    // Obtener por paciente
+    public String obtenerPorPaciente(Long pacienteId) {
+        List<Tratamiento> lista = tratamientoRepository.findByPacienteId(pacienteId);
+        return crearBundle(lista);
+    }
+
+    // Obtener por doctor
+    public String obtenerPorDoctor(Long doctorId) {
+        List<Tratamiento> lista = tratamientoRepository.findByDoctorId(doctorId);
+        return crearBundle(lista);
+    }
+
+    // Obtener tratamientos activos
+    public String obtenerActivos() {
+        List<Tratamiento> lista = tratamientoRepository.findByEstadoTratamiento(
+            com.projecte.radioisotopo.Model.EstadoTratamiento.ACTIVO);
+        return crearBundle(lista);
+    }
+
+    // Obtener todos incluyendo eliminados (para ADMIN)
+    public String obtenerTodosIncluyendoEliminados() {
+        List<Tratamiento> lista = tratamientoRepository.findAllIncludingInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener solo eliminados (para ADMIN)
+    public String obtenerEliminados() {
+        List<Tratamiento> lista = tratamientoRepository.findAllInactive();
+        return crearBundle(lista);
+    }
+
+    // Obtener por ID incluyendo eliminados (para ADMIN)
+    public String obtenerPorIdIncluyendoEliminado(Long id) {
+        Optional<Tratamiento> tOpt = tratamientoRepository.findByIdIncludingInactive(id);
+        if (tOpt.isPresent()) {
+            return fhirParser.encodeResourceToString(convertirAFhir(tOpt.get()));
+        }
+        return null;
+    }
+
+    // Helper para crear Bundle
+    private String crearBundle(List<Tratamiento> lista) {
+        Bundle bundle = new Bundle();
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        for (Tratamiento t : lista) {
+            bundle.addEntry().setResource(convertirAFhir(t));
+        }
+        return fhirParser.encodeResourceToString(bundle);
+    }
+
     // TRADUCTOR FHIR: Tratamiento (Java) -> CarePlan (FHIR)
     private CarePlan convertirAFhir(Tratamiento t) {
         CarePlan cp = new CarePlan();
         cp.setId(t.getId().toString());
 
-        // Estado y Propósito
-        cp.setStatus(CarePlan.CarePlanStatus.ACTIVE);
+        // Estado y Propósito (Mapeo dinámico)
+        if (t.getEstadoTratamiento() != null) {
+            switch (t.getEstadoTratamiento()) {
+                case ACTIVO:
+                    cp.setStatus(CarePlan.CarePlanStatus.ACTIVE);
+                    break;
+                case FINALIZADO:
+                    cp.setStatus(CarePlan.CarePlanStatus.COMPLETED);
+                    break;
+                case CANCELADO:
+                    cp.setStatus(CarePlan.CarePlanStatus.REVOKED);
+                    break;
+            }
+        } else {
+            cp.setStatus(CarePlan.CarePlanStatus.UNKNOWN);
+        }
         cp.setIntent(CarePlan.CarePlanIntent.PLAN);
         cp.setTitle("Tratamiento de Radioisótopo: " + t.getTipoIsotopo());
 
