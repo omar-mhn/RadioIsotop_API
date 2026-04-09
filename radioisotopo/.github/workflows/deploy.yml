@@ -15,7 +15,7 @@ jobs:
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/RadioIsotop_API/radioisotopo
             git pull origin main
