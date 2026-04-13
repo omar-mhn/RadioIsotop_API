@@ -31,6 +31,7 @@ public class SecurityConfiguration {
                 // Permitimos el acceso total a las rutas de autenticación (Login/Registro)
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 
                 // Cualquier otra petición debe estar autenticada
                 .anyRequest().authenticated()
