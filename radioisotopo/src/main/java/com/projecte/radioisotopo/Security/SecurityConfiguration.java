@@ -25,6 +25,9 @@ public class SecurityConfiguration {
         http
             // Desactivamos CSRF porque usamos JWT (no usamos cookies de sesión)
             .csrf(csrf -> csrf.disable())
+
+            // Activamos Cors para que el navegador deje comunicar bien
+            .cors(cors -> {})
             
             // Definimos las reglas de acceso a las rutas
             .authorizeHttpRequests(auth -> auth
