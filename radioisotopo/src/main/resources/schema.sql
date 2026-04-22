@@ -164,10 +164,4 @@ CREATE TABLE IF NOT EXISTS Alerta (
         ON DELETE CASCADE
 );
 
--- MIGRACIÓN idempotente: mover foto_perfil desde Doctor/Paciente hacia Usuario
-ALTER TABLE Usuario ADD COLUMN IF NOT EXISTS foto_perfil VARCHAR(255);
-ALTER TABLE Doctor DROP COLUMN IF EXISTS foto_perfil;
-ALTER TABLE Paciente DROP COLUMN IF EXISTS foto_perfil;
 
--- MIGRACIÓN idempotente: agregar id_android en reloj
-ALTER TABLE Reloj ADD COLUMN IF NOT EXISTS id_android VARCHAR(100) UNIQUE;
