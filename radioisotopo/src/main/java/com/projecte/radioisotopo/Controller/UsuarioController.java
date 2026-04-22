@@ -1,5 +1,7 @@
 package com.projecte.radioisotopo.Controller;
 
+import com.projecte.radioisotopo.DTO.UsuarioFotoPerfilRequest;
+import com.projecte.radioisotopo.DTO.UsuarioFotoPerfilResponse;
 import com.projecte.radioisotopo.Model.Usuario;
 import com.projecte.radioisotopo.Service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,5 +69,27 @@ public class UsuarioController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #idUsuario == authentication.principal.id")
+    @GetMapping("/usuarios/{idUsuario}/foto-perfil")
+    public ResponseEntity<UsuarioFotoPerfilResponse> getFotoPerfilByUsuarioId(@PathVariable Long idUsuario) {
+        Usuario usuario = usuarioService.obtenerPorId(idUsuario);
+        if (usuario == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(new UsuarioFotoPerfilResponse(idUsuario, usuario.getFotoPerfil()));
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #idUsuario == authentication.principal.id")
+    @PutMapping("/usuarios/{idUsuario}/foto-perfil")
+    public ResponseEntity<UsuarioFotoPerfilResponse> updateFotoPerfilByUsuarioId(
+            @PathVariable Long idUsuario,
+            @RequestBody UsuarioFotoPerfilRequest request) {
+        Usuario usuarioActualizado = usuarioService.actualizarFotoPerfil(idUsuario, request.fotoPerfil());
+        if (usuarioActualizado == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(new UsuarioFotoPerfilResponse(idUsuario, usuarioActualizado.getFotoPerfil()));
     }
 }

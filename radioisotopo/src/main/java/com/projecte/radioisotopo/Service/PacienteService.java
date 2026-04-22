@@ -46,7 +46,6 @@ public class PacienteService {
         nuevoPaciente.setTipoDocumento(dto.tipoDocumento());
         nuevoPaciente.setTarjetaSanitaria(dto.tarjetaSanitaria());
         nuevoPaciente.setFechaNacimiento(dto.fechaNacimiento());
-        nuevoPaciente.setFotoPerfil(dto.fotoPerfil());
         nuevoPaciente.setPeso(dto.peso());
         nuevoPaciente.setAltura(dto.altura());
         nuevoPaciente.setActivo(true);
@@ -109,8 +108,7 @@ public class PacienteService {
             pacienteExistente.setFechaNacimiento(dto.fechaNacimiento());
             pacienteExistente.setPeso(dto.peso());
             pacienteExistente.setAltura(dto.altura());
-            pacienteExistente.setFotoPerfil(dto.fotoPerfil());
-            
+             
             // Actualizamos el departamento y los familiares
             if (dto.departamentoId() != null) {
                 Departamento d = departamentoRepository.findById(dto.departamentoId()).orElse(null);
@@ -238,11 +236,6 @@ public class PacienteService {
         fhirPatient.addTelecom()
             .setSystem(ContactPoint.ContactPointSystem.PHONE)
             .setValue(miPaciente.getNumTelefono());
-
-        // foto perfil
-        if (miPaciente.getFotoPerfil() != null) {
-            fhirPatient.addPhoto().setUrl(miPaciente.getFotoPerfil());
-        }
 
         // Fecha de Nacimiento
         if (miPaciente.getFechaNacimiento() != null) {

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS Usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL, 
+    foto_perfil VARCHAR(255),
     role ENUM('ADMIN', 'DOCTOR', 'PACIENTE', 'FAMILIAR') NOT NULL,
     activo BOOLEAN DEFAULT TRUE
 );
@@ -25,7 +26,6 @@ CREATE TABLE IF NOT EXISTS Doctor (
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     num_colegiado VARCHAR(50),
-    foto_perfil VARCHAR(255),
     id_departamento INT,
     activo BOOLEAN DEFAULT TRUE,
     CONSTRAINT fk_doctor_departamento
@@ -47,7 +47,6 @@ CREATE TABLE IF NOT EXISTS Paciente (
     tipo_documento VARCHAR(50) NOT NULL,
     tarjeta_sanitaria VARCHAR(50) UNIQUE,
     fecha_nacimiento DATE,
-    foto_perfil VARCHAR(255),
     peso DECIMAL(5,2),
     altura DECIMAL(5,2),
     id_departamento INT,
@@ -97,6 +96,7 @@ CREATE TABLE IF NOT EXISTS Reloj (
     id INT AUTO_INCREMENT PRIMARY KEY,
     imei VARCHAR(50) UNIQUE NOT NULL,
     mac_address VARCHAR(50) UNIQUE NOT NULL,
+    id_android VARCHAR(100) UNIQUE,
     estado_reloj ENUM('DISPONIBLE', 'ASIGNADO', 'EN_MANTENIMIENTO') NOT NULL,
     bateria_actual INT NOT NULL,
     activo BOOLEAN DEFAULT TRUE
@@ -163,3 +163,11 @@ CREATE TABLE IF NOT EXISTS Alerta (
         REFERENCES Tratamientos(id)
         ON DELETE CASCADE
 );
+
+-- MIGRACIÓN idempotente: mover foto_perfil desde Doctor/Paciente hacia Usuario
+ALTER TABLE Usuario ADD COLUMN IF NOT EXISTS foto_perfil VARCHAR(255);
+ALTER TABLE Doctor DROP COLUMN IF EXISTS foto_perfil;
+ALTER TABLE Paciente DROP COLUMN IF EXISTS foto_perfil;
+
+-- MIGRACIÓN idempotente: agregar id_android en reloj
+ALTER TABLE Reloj ADD COLUMN IF NOT EXISTS id_android VARCHAR(100) UNIQUE;

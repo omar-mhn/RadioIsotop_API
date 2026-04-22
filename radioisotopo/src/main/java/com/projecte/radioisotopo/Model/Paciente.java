@@ -48,9 +48,6 @@ public class Paciente {
     @Column(name = "fecha_nacimiento")
     private Date fechaNacimiento;
 
-    @Column(name = "foto_perfil") 
-    private String fotoPerfil;
-
     @Column(name = "id_usuario", unique = true, nullable = false)
     private Long idUsuario;
 
@@ -84,7 +81,7 @@ public class Paciente {
     
 
     public Paciente(String nombre, String apellido, String numTelefono, String numDocumento,
-            String tipoDocumento, String tarjetaSanitaria, Date fechaNacimiento, String fotoPerfil, Double peso,
+            String tipoDocumento, String tarjetaSanitaria, Date fechaNacimiento, Double peso,
             Double altura, Departamento departamento, List<Familiar> familiares) {
         this.nombre = nombre;
         this.apellido = apellido;
@@ -93,7 +90,6 @@ public class Paciente {
         this.tipoDocumento = tipoDocumento;
         this.tarjetaSanitaria = tarjetaSanitaria;
         this.fechaNacimiento = fechaNacimiento;
-        this.fotoPerfil = fotoPerfil;
         this.peso = peso;
         this.altura = altura;
         this.departamento = departamento;
@@ -197,14 +193,6 @@ public class Paciente {
 
     public void setTipoDocumento(String tipoDocumento) {
         this.tipoDocumento = tipoDocumento;
-    }
-
-    public String getFotoPerfil() {
-        return fotoPerfil;
-    }
-
-    public void setFotoPerfil(String fotoPerfil) {
-        this.fotoPerfil = fotoPerfil;
     }
 
     public boolean isActivo() {

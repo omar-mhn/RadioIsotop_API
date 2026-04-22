@@ -12,7 +12,6 @@ public record PacienteDTO(
     String tipoDocumento,
     String tarjetaSanitaria,
     Date fechaNacimiento,
-    String fotoPerfil,
     Double peso,
     Double altura,
     Long departamentoId,

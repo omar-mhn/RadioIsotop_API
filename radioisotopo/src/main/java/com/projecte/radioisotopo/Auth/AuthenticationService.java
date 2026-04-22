@@ -32,7 +32,7 @@ public class AuthenticationService {
         
         //Generamos el token JWT para el nuevo usuario
         var jwtToken = jwtService.generarToken(user);
-        return new AuthenticationResponse(jwtToken);
+        return new AuthenticationResponse(jwtToken, user.getId());
     }
 
     //LOGIN DE USUARIO EXISTENTE 
@@ -51,6 +51,6 @@ public class AuthenticationService {
         
         var jwtToken = jwtService.generarToken(user);
         
-        return new AuthenticationResponse(jwtToken);
+        return new AuthenticationResponse(jwtToken, user.getId());
     }
 }

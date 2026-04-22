@@ -26,6 +26,7 @@ public class RelojService {
         Reloj newReloj = new Reloj();
         newReloj.setImei(dto.imei());
         newReloj.setMacAddress(dto.macAddress());
+        newReloj.setIdAndroid(dto.idAndroid());
         newReloj.setEstadoReloj(dto.estadoReloj());
         newReloj.setBateriaActual(dto.bateriaActual());
         newReloj.setActivo(true);
@@ -56,6 +57,7 @@ public class RelojService {
             Reloj r = relojOpt.get();
             r.setImei(dto.imei());
             r.setMacAddress(dto.macAddress());
+            r.setIdAndroid(dto.idAndroid());
             r.setEstadoReloj(dto.estadoReloj());
             r.setBateriaActual(dto.bateriaActual());
             
@@ -129,6 +131,13 @@ public class RelojService {
         fhirDevice.addIdentifier()
             .setSystem("urn:ieee:mac")
             .setValue(miReloj.getMacAddress());
+
+        // Android ID (si existe)
+        if (miReloj.getIdAndroid() != null) {
+            fhirDevice.addIdentifier()
+                .setSystem("urn:android:id")
+                .setValue(miReloj.getIdAndroid());
+        }
 
         // Etat de la batterie (on l'ajoute comme une note ou un nom de modèle)
         fhirDevice.setDeviceName(List.of(new Device.DeviceDeviceNameComponent()

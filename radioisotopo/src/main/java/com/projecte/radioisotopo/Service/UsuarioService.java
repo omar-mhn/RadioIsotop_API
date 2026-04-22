@@ -66,4 +66,13 @@ public class UsuarioService implements UserDetailsService {
     public Usuario obtenerPorIdIncluyendoInactivo(Long id) {
         return usuarioRepository.findByIdIncludingInactive(id).orElse(null);
     }
+
+    public Usuario actualizarFotoPerfil(Long idUsuario, String fotoPerfil) {
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+        if (usuario == null) {
+            return null;
+        }
+        usuario.setFotoPerfil(fotoPerfil);
+        return usuarioRepository.save(usuario);
+    }
 }

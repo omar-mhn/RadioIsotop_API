@@ -32,9 +32,6 @@ import jakarta.persistence.Column;
             @Column(name="num_colegiado",length = 50)
             private String numColegiado;
 
-            @Column(name = "foto_perfil") 
-            private String fotoPerfil;
-
             @Column(name = "id_usuario", unique = true, nullable = false)
             private Long idUsuario;
 
@@ -50,11 +47,10 @@ import jakarta.persistence.Column;
             
 
             public Doctor( String nombre, String apellido, String email, String numColegiado,
-                    String fotoPerfil, Departamento departamento) {
+                    Departamento departamento) {
                 this.nombre = nombre;
                 this.apellido = apellido;
                 this.numColegiado = numColegiado;
-                this.fotoPerfil = fotoPerfil;
                 this.departamento = departamento;
                 this.activo = true;
             }
@@ -106,13 +102,6 @@ import jakarta.persistence.Column;
             public void setActivo(boolean activo) {
                 this.activo = activo;
             }
-            public String getFotoPerfil() {
-                return fotoPerfil;
-            }
-            public void setFotoPerfil(String fotoPerfil) {
-                this.fotoPerfil = fotoPerfil;
-            }
-
             public Long getIdUsuario() {
                 return idUsuario;
             }

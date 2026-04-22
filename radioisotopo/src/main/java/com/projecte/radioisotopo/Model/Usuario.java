@@ -32,6 +32,9 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "foto_perfil")
+    private String fotoPerfil;
+
     @Enumerated(EnumType.STRING)
     private Role role; 
 
@@ -71,6 +74,8 @@ public class Usuario implements UserDetails {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     public void setPassword(String password) { this.password = password; }
+    public String getFotoPerfil() { return fotoPerfil; }
+    public void setFotoPerfil(String fotoPerfil) { this.fotoPerfil = fotoPerfil; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 }

@@ -37,7 +37,6 @@ public class DoctorService {
         newDoctor.setNombre(dto.nombre());
         newDoctor.setApellido(dto.apellido());
         newDoctor.setNumColegiado(dto.numColegiado());
-        newDoctor.setFotoPerfil(dto.fotoPerfil());
         newDoctor.setActivo(true);
         if (dto.departamentoId() != null) {
             Departamento d = departamentoRepository.findById(dto.departamentoId()).orElse(null);
@@ -74,7 +73,6 @@ public class DoctorService {
             doctorExistente.setNombre(dto.nombre());
             doctorExistente.setApellido(dto.apellido());
             doctorExistente.setNumColegiado(dto.numColegiado());
-            doctorExistente.setFotoPerfil(dto.fotoPerfil());
             // Actualizamos el departamento asignado
             if (dto.departamentoId() != null) {
                 Departamento d = departamentoRepository.findById(dto.departamentoId()).orElse(null);
@@ -82,8 +80,7 @@ public class DoctorService {
             } else {
                 doctorExistente.setDepartamento(null);
             }
-           
-            
+
             Doctor doctorActualizado = doctorRepository.save(doctorExistente);
             return fhirParser.encodeResourceToString(convertirAFhir(doctorActualizado));
         }
@@ -163,12 +160,6 @@ public class DoctorService {
             .addGiven(miDoctor.getNombre())
             .setFamily(miDoctor.getApellido());
             
-        // foto
-        if (miDoctor.getFotoPerfil() != null) {
-            fhirPractitioner.addPhoto()
-                .setUrl(miDoctor.getFotoPerfil())
-                .setContentType("image/jpeg"); // Ou selon ton format standard
-        }
         // Relación con el Departamento (Organization)
         if (miDoctor.getDepartamento() != null) {
             // Creamos la referencia al departamento

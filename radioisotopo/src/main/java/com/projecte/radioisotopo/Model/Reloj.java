@@ -26,6 +26,9 @@ public class Reloj {
     @Column(name = "mac_address",length = 50, unique = true, nullable = false)
     private String macAddress;
 
+    @Column(name = "id_android", length = 100, unique = true)
+    private String idAndroid;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_reloj")
     private EstadoReloj estadoReloj;
@@ -36,10 +39,11 @@ public class Reloj {
     @Column(nullable = false)
     private boolean activo = true;
 
-    public Reloj(String imei, String macAddress, EstadoReloj estadoReloj, int bateriaActual) {
+    public Reloj(String imei, String macAddress, String idAndroid, EstadoReloj estadoReloj, int bateriaActual) {
         
         this.imei = imei;
         this.macAddress = macAddress;
+        this.idAndroid = idAndroid;
         this.estadoReloj = estadoReloj;
         this.bateriaActual = bateriaActual;
         this.activo =true;
@@ -70,6 +74,14 @@ public class Reloj {
 
     public void setMacAddress(String macAddress) {
         this.macAddress = macAddress;
+    }
+
+    public String getIdAndroid() {
+        return idAndroid;
+    }
+
+    public void setIdAndroid(String idAndroid) {
+        this.idAndroid = idAndroid;
     }
 
     public EstadoReloj getEstadoReloj() {
