@@ -39,6 +39,7 @@ public class PacienteService {
     // Crear un nuevo paciente
     public String createPacient(PacienteDTO dto){
         Paciente nuevoPaciente = new Paciente();
+        nuevoPaciente.setIdUsuario(dto.idUsuario());
         nuevoPaciente.setNombre(dto.nombre());
         nuevoPaciente.setApellido(dto.apellido());
         nuevoPaciente.setNumTelefono(dto.numTelefono());

@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.util.List;
 
 public record PacienteDTO(
+    Long idUsuario,
     @NotBlank(message = "El nombre es obligatorio") String nombre,
     @NotBlank(message = "El apellido es obligatorio") String apellido,
     @NotBlank(message = "El numero de telefono es obligatorio") String numTelefono,
