@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record DoctorDTO(
+    Long idUsuario,
     @NotBlank(message = "El nombre es obligatorio") String nombre,
     @NotBlank(message = "El apellido es obligatorio") String apellido,
     String numColegiado,

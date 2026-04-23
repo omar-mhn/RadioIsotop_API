@@ -34,6 +34,7 @@ public class DoctorService {
     // create
     public String crearDoctor(DoctorDTO dto){
         Doctor newDoctor = new Doctor();
+        newDoctor.setIdUsuario(dto.idUsuario());
         newDoctor.setNombre(dto.nombre());
         newDoctor.setApellido(dto.apellido());
         newDoctor.setNumColegiado(dto.numColegiado());
