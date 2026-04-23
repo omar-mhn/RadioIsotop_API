@@ -27,6 +27,7 @@ public class FamiliarService {
     //create
     public String crearFamiliar(FamiliarDTO dto) {
         Familiar f = new Familiar();
+        f.setIdUsuario(dto.idUsuario());
         f.setNombre(dto.nombre());
         f.setApellido(dto.apellido());
         f.setNumTelefono(dto.numTelefono());

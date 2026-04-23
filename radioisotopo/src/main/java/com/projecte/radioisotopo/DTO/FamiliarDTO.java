@@ -3,6 +3,7 @@ package com.projecte.radioisotopo.DTO;
 import jakarta.validation.constraints.NotBlank;
 
 public record FamiliarDTO(
+    Long idUsuario,
     @NotBlank(message = "El nombre es obligatorio") String nombre,
     @NotBlank(message = "El apellido es obligatorio") String apellido,
     @NotBlank(message = "El numero de telefono es obligatorio") String numTelefono,
