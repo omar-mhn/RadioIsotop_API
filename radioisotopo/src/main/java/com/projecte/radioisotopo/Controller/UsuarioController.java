@@ -1,14 +1,17 @@
 package com.projecte.radioisotopo.Controller;
 
-import com.projecte.radioisotopo.DTO.UsuarioFotoPerfilRequest;
 import com.projecte.radioisotopo.DTO.UsuarioFotoPerfilResponse;
 import com.projecte.radioisotopo.Model.Usuario;
 import com.projecte.radioisotopo.Service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -82,11 +85,24 @@ public class UsuarioController {
     }
 
     @PreAuthorize("hasRole('ADMIN') or #idUsuario == authentication.principal.id")
-    @PutMapping("/usuarios/{idUsuario}/foto-perfil")
-    public ResponseEntity<UsuarioFotoPerfilResponse> updateFotoPerfilByUsuarioId(
+    @GetMapping("/usuarios/{idUsuario}/foto-perfil/imagen")
+    public ResponseEntity<byte[]> getImagenFotoPerfilByUsuarioId(@PathVariable Long idUsuario) throws IOException {
+        byte[] imagen = usuarioService.obtenerImagenFotoPerfil(idUsuario);
+        if (imagen == null) {
+            return ResponseEntity.notFound().build();
+        }
+        String tipoContenido = usuarioService.obtenerTipoContenidoImagen(idUsuario);
+        HttpHeaders cabeceras = new HttpHeaders();
+        cabeceras.setContentType(MediaType.parseMediaType(tipoContenido));
+        return ResponseEntity.ok().headers(cabeceras).body(imagen);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #idUsuario == authentication.principal.id")
+    @PatchMapping(value = "/usuarios/{idUsuario}/foto-perfil", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UsuarioFotoPerfilResponse> actualizarFotoPerfilByUsuarioId(
             @PathVariable Long idUsuario,
-            @RequestBody UsuarioFotoPerfilRequest request) {
-        Usuario usuarioActualizado = usuarioService.actualizarFotoPerfil(idUsuario, request.fotoPerfil());
+            @RequestParam("imagen") MultipartFile archivo) throws IOException {
+        Usuario usuarioActualizado = usuarioService.actualizarFotoPerfil(idUsuario, archivo);
         if (usuarioActualizado == null) {
             return ResponseEntity.notFound().build();
         }
