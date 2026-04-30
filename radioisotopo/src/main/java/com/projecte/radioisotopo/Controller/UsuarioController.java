@@ -75,7 +75,7 @@ public class UsuarioController {
     }
 
     @PreAuthorize("hasRole('ADMIN') or #idUsuario == authentication.principal.id")
-    @GetMapping("/usuarios/{idUsuario}/foto-perfil")
+    @GetMapping("/usuarios/{idUsuario}/foto-perfil") // Devuelve Ruta Imagen
     public ResponseEntity<UsuarioFotoPerfilResponse> getFotoPerfilByUsuarioId(@PathVariable Long idUsuario) {
         Usuario usuario = usuarioService.obtenerPorId(idUsuario);
         if (usuario == null) {
@@ -85,7 +85,7 @@ public class UsuarioController {
     }
 
     @PreAuthorize("hasRole('ADMIN') or #idUsuario == authentication.principal.id")
-    @GetMapping("/usuarios/{idUsuario}/foto-perfil/imagen")
+    @GetMapping("/usuarios/{idUsuario}/foto-perfil/imagen") // Devuelve la Imagen del usuario.
     public ResponseEntity<byte[]> getImagenFotoPerfilByUsuarioId(@PathVariable Long idUsuario) throws IOException {
         byte[] imagen = usuarioService.obtenerImagenFotoPerfil(idUsuario);
         if (imagen == null) {
@@ -98,7 +98,7 @@ public class UsuarioController {
     }
 
     @PreAuthorize("hasRole('ADMIN') or #idUsuario == authentication.principal.id")
-    @PatchMapping(value = "/usuarios/{idUsuario}/foto-perfil", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/usuarios/{idUsuario}/foto-perfil", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) // Actualiza la imagen de perfil del Usuario
     public ResponseEntity<UsuarioFotoPerfilResponse> actualizarFotoPerfilByUsuarioId(
             @PathVariable Long idUsuario,
             @RequestParam("imagen") MultipartFile archivo) throws IOException {
