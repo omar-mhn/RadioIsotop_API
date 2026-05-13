@@ -66,10 +66,20 @@ public class TelemetriaController {
         return ResponseEntity.ok(telemetriaService.obtenerPorTratamiento(tratamientoId));
     }
 
-    // Obtener telemetría por paciente (para doctor/admin)
+    // Obtener telemetría por paciente (para ADMIN/DOCTOR)
     @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @GetMapping(value = "/telemetria/paciente/{pacienteId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> obtenerPorPaciente(@PathVariable Long pacienteId) {
+        return ResponseEntity.ok(telemetriaService.obtenerPorPaciente(pacienteId));
+    }
+
+    // FAMILIAR: obtener la telemetría de un paciente vinculado
+    @PreAuthorize("hasRole('FAMILIAR')")
+    @GetMapping(value = "/telemetria/mis-pacientes/{pacienteId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getTelemetriaMiPaciente(
+            @PathVariable Long pacienteId, @AuthenticationPrincipal Usuario usuario) {
+        if (!pacienteService.familiarTieneAccesoAPaciente(usuario.getId(), pacienteId))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         return ResponseEntity.ok(telemetriaService.obtenerPorPaciente(pacienteId));
     }
 

@@ -1,12 +1,15 @@
 package com.projecte.radioisotopo.Controller;
 
 import com.projecte.radioisotopo.Model.Tratamiento;
+import com.projecte.radioisotopo.Model.Usuario;
 import com.projecte.radioisotopo.Service.TratamientoService;
+import com.projecte.radioisotopo.Service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
-import com.projecte.radioisotopo.Model.Tratamiento;
 import com.projecte.radioisotopo.DTO.TratamientoDTO;
 
 @RestController
@@ -26,6 +28,9 @@ public class TratamientoController {
 
     @Autowired
     private TratamientoService tratamientoService;
+
+    @Autowired
+    private PacienteService pacienteService;
 
     
     @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
@@ -70,10 +75,29 @@ public class TratamientoController {
         return ResponseEntity.notFound().build();
     }
 
-    // Obtener tratamientos por paciente
+    // Obtener tratamientos por paciente (ADMIN/DOCTOR)
     @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     @GetMapping(value = "/tratamientos/paciente/{pacienteId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> obtenerPorPaciente(@PathVariable Long pacienteId) {
+        return ResponseEntity.ok(tratamientoService.obtenerPorPaciente(pacienteId));
+    }
+
+    // PACIENTE: obtener su propio tratamiento
+    @PreAuthorize("hasRole('PACIENTE')")
+    @GetMapping(value = "/tratamientos/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getMiTratamiento(@AuthenticationPrincipal Usuario usuario) {
+        Long pacienteId = pacienteService.obtenerIdPacientePorIdUsuario(usuario.getId());
+        if (pacienteId == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(tratamientoService.obtenerPorPaciente(pacienteId));
+    }
+
+    // FAMILIAR: obtener el tratamiento de un paciente vinculado
+    @PreAuthorize("hasRole('FAMILIAR')")
+    @GetMapping(value = "/tratamientos/mis-pacientes/{pacienteId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getTratamientoMiPaciente(
+            @PathVariable Long pacienteId, @AuthenticationPrincipal Usuario usuario) {
+        if (!pacienteService.familiarTieneAccesoAPaciente(usuario.getId(), pacienteId))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         return ResponseEntity.ok(tratamientoService.obtenerPorPaciente(pacienteId));
     }
 

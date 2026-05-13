@@ -1,14 +1,17 @@
 package com.projecte.radioisotopo.Controller;
 
 import com.projecte.radioisotopo.Model.Reloj;
+import com.projecte.radioisotopo.Model.Usuario;
 import com.projecte.radioisotopo.DTO.RelojDTO;
 import jakarta.validation.Valid;
 import com.projecte.radioisotopo.Service.RelojService;
+import com.projecte.radioisotopo.Service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +20,9 @@ public class RelojController {
 
     @Autowired
     private RelojService relojService;
+
+    @Autowired
+    private PacienteService pacienteService;
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/relojes",produces = MediaType.APPLICATION_JSON_VALUE)
@@ -58,6 +64,29 @@ public class RelojController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    // PACIENTE: obtener el reloj vinculado a su propio tratamiento
+    @PreAuthorize("hasRole('PACIENTE')")
+    @GetMapping(value = "/relojes/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getMiReloj(@AuthenticationPrincipal Usuario usuario) {
+        Long pacienteId = pacienteService.obtenerIdPacientePorIdUsuario(usuario.getId());
+        if (pacienteId == null) return ResponseEntity.notFound().build();
+        String fhirJson = relojService.obtenerPorPaciente(pacienteId);
+        if (fhirJson == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(fhirJson);
+    }
+
+    // FAMILIAR: obtener el reloj del paciente vinculado
+    @PreAuthorize("hasRole('FAMILIAR')")
+    @GetMapping(value = "/relojes/mis-pacientes/{pacienteId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getRelojMiPaciente(
+            @PathVariable Long pacienteId, @AuthenticationPrincipal Usuario usuario) {
+        if (!pacienteService.familiarTieneAccesoAPaciente(usuario.getId(), pacienteId))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        String fhirJson = relojService.obtenerPorPaciente(pacienteId);
+        if (fhirJson == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(fhirJson);
     }
 
     // Obtener relojes disponibles

@@ -97,7 +97,7 @@ public class DoctorService {
         return false;
     }
 
-    // Obtenir les données du docteur par son ID utilisateur
+    
     public String obtenerDoctorPorIdUsuario(Long idUsuario) {
         Optional<Doctor> doctorOpt = doctorRepository.findByIdUsuario(idUsuario);
         if (doctorOpt.isPresent()) {
@@ -106,7 +106,7 @@ public class DoctorService {
         return null;
     }
 
-    // Obtenir l'ID du docteur par son ID utilisateur
+   
     public Long obtenerIdDoctorPorIdUsuario(Long idUsuario) {
         Optional<Doctor> doctorOpt = doctorRepository.findByIdUsuario(idUsuario);
         return doctorOpt.map(Doctor::getId).orElse(null);

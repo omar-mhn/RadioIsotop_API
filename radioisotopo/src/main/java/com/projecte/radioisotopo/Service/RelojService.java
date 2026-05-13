@@ -7,8 +7,11 @@ import org.hl7.fhir.r4.model.Device;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.projecte.radioisotopo.Model.Reloj;
+import com.projecte.radioisotopo.Model.Tratamiento;
+import com.projecte.radioisotopo.Model.EstadoTratamiento;
 import com.projecte.radioisotopo.DTO.RelojDTO;
 import com.projecte.radioisotopo.Repository.RelojRepository;
+import com.projecte.radioisotopo.Repository.TratamientoRepository;
 
 import ca.uhn.fhir.parser.IParser;
 
@@ -17,6 +20,9 @@ public class RelojService {
 
     @Autowired
     private RelojRepository relojRepository;
+
+    @Autowired
+    private TratamientoRepository tratamientoRepository;
 
     @Autowired
     private IParser fhirParser;
@@ -107,6 +113,25 @@ public class RelojService {
             return fhirParser.encodeResourceToString(convertirAFhir(relojOpt.get()));
         }
         return null;
+    }
+
+    // Obtener el reloj vinculado al tratamiento activo de un paciente
+    public String obtenerPorPaciente(Long pacienteId) {
+        List<Tratamiento> activos = tratamientoRepository
+            .findByPacienteIdAndEstadoTratamiento(pacienteId, EstadoTratamiento.ACTIVO);
+        Tratamiento tratamiento = null;
+        if (!activos.isEmpty()) {
+            tratamiento = activos.get(activos.size() - 1); // el más reciente
+        } else {
+            // Si no hay activo, usar el último tratamiento disponible
+            List<Tratamiento> todos = tratamientoRepository.findByPacienteId(pacienteId);
+            if (!todos.isEmpty()) {
+                tratamiento = todos.get(todos.size() - 1);
+            }
+        }
+
+        if (tratamiento == null || tratamiento.getReloj() == null) return null;
+        return fhirParser.encodeResourceToString(convertirAFhir(tratamiento.getReloj()));
     }
 
     // Helper para crear Bundle
