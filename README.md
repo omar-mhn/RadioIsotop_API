@@ -3,6 +3,9 @@
 A RESTful backend for managing radioisotope medical treatments. Built with Spring Boot, it handles patient monitoring, treatment tracking, real-time telemetry from smart watches, and alert management — all following the FHIR healthcare interoperability standard.
 
 ---
+[Video General](https://drive.google.com/file/d/1jXC8EPUB8KMynAshimjfury83VPwNUQL/view?usp=sharing)
+
+[Video Web](https://drive.google.com/file/d/1XNWhrhmNUz8q_kJlMWT3B_x0-5yPEmml/view?usp=sharing)
 
 ## Table of Contents
 
