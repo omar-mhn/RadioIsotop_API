@@ -95,12 +95,12 @@ This starts a MySQL 8 container on **port 3305** (mapped to 3306 inside the cont
 mvn spring-boot:run
 ```
 
-The API starts on **http://localhost:8081**.
+The API starts on **[http://141.148.65.35:8081](http://141.148.65.35:8081)**.
 
 ### 3. Open Swagger UI
 
 ```
-http://localhost:8081/swagger-ui/
+http://141.148.65.35:8081/swagger-ui/index.html
 ```
 
 Use the **Authorize** button in Swagger to paste your JWT token and test authenticated endpoints.
@@ -132,6 +132,7 @@ Content-Type: application/json
 {
   "email": "user@example.com",
   "password": "yourpassword",
+  "nombre":"user",
   "role": "ADMIN"
 }
 ```
